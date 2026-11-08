@@ -32,13 +32,10 @@ export default function RootLayout({
                   Dashboard
                 </Link>
                 <Link
-                  href="/stocks"
-                  className="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
+                  href="/invest"
+                  className="text-sm font-semibold text-emerald-700 hover:text-emerald-900 flex items-center gap-1"
                 >
-                  <span>Stocks</span>
-                  <span className="rounded-full bg-indigo-100 px-1.5 py-0.2 text-[10px] font-bold text-indigo-700">
-                    24/7
-                  </span>
+                  <span>📈 Invest (Yield-to-Stock)</span>
                 </Link>
               </nav>
               <ConnectButton />

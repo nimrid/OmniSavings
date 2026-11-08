@@ -9,8 +9,8 @@ const HIGHLIGHTS = [
   },
   {
     title: "Yield-to-Equity Auto-Invest",
-    tag: "Backpack Exchange",
-    desc: "Never risk your principal. Automatically allocate accrued savings yield into 24/7 tokenized US stocks & indices (NVDA, AAPL, SPY).",
+    tag: "Real On-Chain Stocks",
+    desc: "Never risk your principal. Automatically deploy accrued passive savings yield into real tokenized US equities & S&P 500 (SPYx, NVDAx, AAPLx).",
     color: "bg-purple-50 text-purple-700 border-purple-200",
   },
   {
@@ -34,6 +34,11 @@ const PROTOCOLS = [
     note: "Anchor Program `AhYUb1t...ktTT` calling Jupiter Lend Earn",
   },
   {
+    name: "Yield-to-Equity (Jupiter Swap)",
+    chain: "Solana Mainnet",
+    note: "Tokenized Equities & S&P 500 (SPYx, NVDAx, AAPLx, TSLAx, USDY)",
+  },
+  {
     name: "Jupiter Earn",
     chain: "Solana",
     note: "jlToken lending markets (jlUSDC, jlUSDT)",
@@ -42,11 +47,6 @@ const PROTOCOLS = [
     name: "Lulo",
     chain: "Solana",
     note: "Flexible savings and principal-protected lending",
-  },
-  {
-    name: "Backpack Exchange",
-    chain: "Solana RWA",
-    note: "24/7 Tokenized Equities & Index ETFs (NVDA, AAPL, SPY, QQQ, TSLA)",
   },
 ];
 
@@ -73,10 +73,10 @@ export default function HomePage() {
           Open Yield Dashboard →
         </Link>
         <Link
-          href="/stocks"
+          href="/invest"
           className="inline-block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-indigo-700 transition-colors"
         >
-          Stock RWAs & Auto-DCA →
+          📈 Yield-to-Stock Auto-Invest →
         </Link>
         <a
           href="https://github.com/your-username/defi-savings-app"
