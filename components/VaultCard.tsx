@@ -12,15 +12,26 @@ interface VaultCardProps {
 
 export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
   const { primaryWallet } = useConnectedWallets();
-  const { account, loading, depositing, error, txSignature, depositToVault, refetch } =
-    useVault(asset);
+  const {
+    account,
+    loading,
+    depositing,
+    withdrawing,
+    error,
+    txSignature,
+    depositToVault,
+    withdrawFromVault,
+    refetch,
+  } = useVault(asset);
 
   const [amount, setAmount] = useState("10");
   const [savingsGoal, setSavingsGoal] = useState("1000");
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"deposit" | "withdraw">("deposit");
   const [actionError, setActionError] = useState<string | null>(null);
 
   const totalDeposited = account?.totalDeposited ?? 0;
+  const totalWithdrawn = account?.totalWithdrawn ?? 0;
   const goal = account?.savingsGoal ?? Number(savingsGoal);
   const progressPct = goal > 0 ? Math.min(100, Math.round((totalDeposited / goal) * 100)) : 0;
 
@@ -38,6 +49,34 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Deposit failed");
     }
+  };
+
+  const handleWithdraw = async () => {
+    setActionError(null);
+    const num = Number(amount);
+    if (isNaN(num) || num <= 0) {
+      setActionError("Please enter a valid positive withdrawal amount.");
+      return;
+    }
+
+    try {
+      await withdrawFromVault(num);
+      setModalOpen(false);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Withdrawal failed");
+    }
+  };
+
+  const openDepositModal = () => {
+    setModalMode("deposit");
+    setActionError(null);
+    setModalOpen(true);
+  };
+
+  const openWithdrawModal = () => {
+    setModalMode("withdraw");
+    setActionError(null);
+    setModalOpen(true);
   };
 
   return (
@@ -72,11 +111,18 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
             </div>
           )}
           <button
-            onClick={() => setModalOpen(true)}
-            disabled={!primaryWallet || depositing}
+            onClick={openDepositModal}
+            disabled={!primaryWallet || depositing || withdrawing}
             className="rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
           >
             {depositing ? "Confirming…" : "Deposit into Vault"}
+          </button>
+          <button
+            onClick={openWithdrawModal}
+            disabled={!primaryWallet || depositing || withdrawing}
+            className="rounded-lg border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50 disabled:opacity-50 transition-colors"
+          >
+            {withdrawing ? "Confirming…" : "Withdraw"}
           </button>
         </div>
       </div>
@@ -100,14 +146,16 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
           <span className="font-medium text-slate-800">Jupiter Lend</span>
         </div>
         <div className="rounded-lg bg-white/80 p-2.5 border border-slate-200/80">
-          <p className="text-slate-500">Vault Balance</p>
+          <p className="text-slate-500">Total Deposited</p>
           <span className="font-semibold text-slate-900">
             {loading ? "…" : `${totalDeposited.toLocaleString()} ${asset}`}
           </span>
         </div>
         <div className="rounded-lg bg-white/80 p-2.5 border border-slate-200/80">
-          <p className="text-slate-500">Goal Progress</p>
-          <span className="font-semibold text-slate-900">{progressPct}%</span>
+          <p className="text-slate-500">Total Withdrawn</p>
+          <span className="font-semibold text-slate-900">
+            {loading ? "…" : `${totalWithdrawn.toLocaleString()} ${asset}`}
+          </span>
         </div>
       </div>
 
@@ -132,7 +180,7 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
       {/* Success Notification */}
       {txSignature && (
         <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-900 flex items-center justify-between">
-          <span>Deposit confirmed on Solana via Jupiter CPI!</span>
+          <span>Transaction confirmed on Solana via Jupiter CPI!</span>
           <a
             href={`https://solscan.io/tx/${txSignature}`}
             target="_blank"
@@ -151,7 +199,7 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
         </div>
       )}
 
-      {/* Deposit Modal */}
+      {/* Action Modal (Deposit or Withdraw) */}
       {modalOpen && (
         <div
           role="dialog"
@@ -162,10 +210,12 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">
-                  Deposit into On-Chain Vault
+                  {modalMode === "deposit"
+                    ? "Deposit into On-Chain Vault"
+                    : "Withdraw from On-Chain Vault"}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Executes Solana Anchor CPI $\to$ Jupiter Lend Earn
+                  Executes Solana Anchor CPI $\leftrightarrow$ Jupiter Lend Earn
                 </p>
               </div>
               <button
@@ -176,10 +226,42 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
               </button>
             </div>
 
+            {/* Modal Tab Switcher */}
+            <div className="mt-4 flex border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMode("deposit");
+                  setActionError(null);
+                }}
+                className={`pb-2 px-3 text-xs font-semibold transition-colors border-b-2 ${
+                  modalMode === "deposit"
+                    ? "border-indigo-600 text-indigo-700"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                Deposit
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMode("withdraw");
+                  setActionError(null);
+                }}
+                className={`pb-2 px-3 text-xs font-semibold transition-colors border-b-2 ${
+                  modalMode === "withdraw"
+                    ? "border-indigo-600 text-indigo-700"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                Withdraw
+              </button>
+            </div>
+
             <div className="mt-4 space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-700">
-                  Deposit Amount ({asset})
+                  {modalMode === "deposit" ? "Deposit" : "Withdraw"} Amount ({asset})
                 </label>
                 <input
                   type="number"
@@ -192,31 +274,43 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-700">
-                  Target Savings Goal ({asset})
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="any"
-                  value={savingsGoal}
-                  onChange={(e) => setSavingsGoal(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
-                  placeholder="e.g. 1000"
-                />
-                <p className="mt-1 text-[11px] text-slate-500">
-                  Recorded in your on-chain UserSavings PDA for goal tracking.
-                </p>
-              </div>
+              {modalMode === "deposit" ? (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700">
+                      Target Savings Goal ({asset})
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="any"
+                      value={savingsGoal}
+                      onChange={(e) => setSavingsGoal(e.target.value)}
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
+                      placeholder="e.g. 1000"
+                    />
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Recorded in your on-chain UserSavings PDA for goal tracking.
+                    </p>
+                  </div>
 
-              <div className="rounded-lg bg-indigo-50/60 border border-indigo-100 p-3 text-xs text-indigo-900 space-y-1">
-                <p className="font-semibold">CPI Execution Flow:</p>
-                <p>1. User invokes `onchain::deposit_to_jupiter`</p>
-                <p>2. Program updates UserSavings state PDA</p>
-                <p>3. Program executes CPI into `jup3YeL8QhtSx...`</p>
-                <p>4. Jupiter mints jlToken shares directly to your wallet</p>
-              </div>
+                  <div className="rounded-lg bg-indigo-50/60 border border-indigo-100 p-3 text-xs text-indigo-900 space-y-1">
+                    <p className="font-semibold">CPI Deposit Flow:</p>
+                    <p>1. User invokes `onchain::deposit_to_jupiter`</p>
+                    <p>2. Program updates UserSavings state PDA</p>
+                    <p>3. Program executes CPI into `jup3YeL8QhtSx...`</p>
+                    <p>4. Jupiter mints jlToken shares directly to your wallet</p>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-lg bg-indigo-50/60 border border-indigo-100 p-3 text-xs text-indigo-900 space-y-1">
+                  <p className="font-semibold">CPI Withdrawal Flow:</p>
+                  <p>1. User invokes `onchain::withdraw_from_jupiter`</p>
+                  <p>2. Program burns jlToken shares via Jupiter Earn CPI</p>
+                  <p>3. Jupiter transfers underlying {asset} back to your wallet</p>
+                  <p>4. Program updates on-chain total withdrawn metrics</p>
+                </div>
+              )}
 
               {actionError && (
                 <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-800">
@@ -233,11 +327,15 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
                 Cancel
               </button>
               <button
-                onClick={handleDeposit}
-                disabled={depositing}
+                onClick={modalMode === "deposit" ? handleDeposit : handleWithdraw}
+                disabled={depositing || withdrawing}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 shadow-sm"
               >
-                {depositing ? "Executing CPI…" : `Deposit ${amount} ${asset}`}
+                {depositing || withdrawing
+                  ? "Executing CPI…"
+                  : modalMode === "deposit"
+                  ? `Deposit ${amount} ${asset}`
+                  : `Withdraw ${amount} ${asset}`}
               </button>
             </div>
           </div>

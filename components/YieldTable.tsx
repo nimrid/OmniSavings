@@ -18,6 +18,7 @@ const PROTOCOL_LABEL: Record<YieldQuote["protocol"], string> = {
 
 export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
   const [luloModalOpen, setLuloModalOpen] = useState(false);
+  const [luloModalTab, setLuloModalTab] = useState<"deposit" | "withdraw">("deposit");
   const [luloSelectedMode, setLuloSelectedMode] = useState<"regular" | "protected">("regular");
   const [selectedAsset, setSelectedAsset] = useState("USDC");
 
@@ -43,6 +44,19 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
     } else if (q.protocol === "lulo") {
       setSelectedAsset(q.asset);
       setLuloSelectedMode(q.marketId.includes("protected") ? "protected" : "regular");
+      setLuloModalTab("deposit");
+      setLuloModalOpen(true);
+    }
+  };
+
+  const handleWithdrawClick = (q: YieldQuote) => {
+    if (q.protocol === "jupiter") {
+      const el = document.getElementById("vault-card-section");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else if (q.protocol === "lulo") {
+      setSelectedAsset(q.asset);
+      setLuloSelectedMode(q.marketId.includes("protected") ? "protected" : "regular");
+      setLuloModalTab("withdraw");
       setLuloModalOpen(true);
     }
   };
@@ -96,16 +110,28 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
                     {q.source}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => handleDepositClick(q)}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-colors ${
-                        isJupiter
-                          ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                          : "bg-emerald-700 text-white hover:bg-emerald-800"
-                      }`}
-                    >
-                      {isJupiter ? "Deposit (CPI Vault)" : "Deposit"}
-                    </button>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => handleDepositClick(q)}
+                        className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold shadow-sm transition-colors ${
+                          isJupiter
+                            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                            : "bg-emerald-700 text-white hover:bg-emerald-800"
+                        }`}
+                      >
+                        {isJupiter ? "Deposit (CPI)" : "Deposit"}
+                      </button>
+                      <button
+                        onClick={() => handleWithdrawClick(q)}
+                        className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold shadow-sm transition-colors ${
+                          isJupiter
+                            ? "border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                            : "border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                        }`}
+                      >
+                        Withdraw
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -114,12 +140,13 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
         </table>
       </div>
 
-      {/* Lulo Deposit Modal */}
+      {/* Lulo Deposit / Withdraw Modal */}
       <LuloDepositModal
         open={luloModalOpen}
         onClose={() => setLuloModalOpen(false)}
         asset={selectedAsset}
         defaultMode={luloSelectedMode}
+        initialTab={luloModalTab}
         regularApy={regularQuote?.apyNet}
         protectedApy={protectedQuote?.apyNet}
       />

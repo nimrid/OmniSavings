@@ -160,6 +160,80 @@ export function createDepositToJupiterInstruction(params: {
   });
 }
 
+export interface JupiterWithdrawAccounts {
+  ownerTokenAccount: PublicKey;
+  recipientTokenAccount: PublicKey;
+  lendingAdmin: PublicKey;
+  lending: PublicKey;
+  mint: PublicKey;
+  fTokenMint: PublicKey;
+  supplyTokenReservesLiquidity: PublicKey;
+  lendingSupplyPositionOnLiquidity: PublicKey;
+  rateModel: PublicKey;
+  vault: PublicKey;
+  claimAccount: PublicKey;
+  liquidity: PublicKey;
+  liquidityProgram: PublicKey;
+  rewardsRateModel: PublicKey;
+  tokenProgram: PublicKey;
+  associatedTokenProgram: PublicKey;
+  systemProgram: PublicKey;
+  lendingProgram?: PublicKey;
+}
+
+/**
+ * Builds the instruction to withdraw from Jupiter Lend Earn via our on-chain CPI program
+ */
+export function createWithdrawFromJupiterInstruction(params: {
+  signer: PublicKey;
+  amount: bigint | number;
+  jupiterAccounts: JupiterWithdrawAccounts;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = params.programId || new PublicKey(VAULT_PROGRAM_ID);
+  const lendingProgramId =
+    params.jupiterAccounts.lendingProgram ||
+    new PublicKey(JUPITER_EARN_PROGRAM_ID);
+
+  const [userSavings] = deriveUserSavingsPDA(
+    params.signer,
+    params.jupiterAccounts.mint,
+    programId
+  );
+
+  const data = Buffer.concat([
+    WITHDRAW_FROM_JUPITER_DISCRIMINATOR,
+    encodeU64(params.amount),
+  ]);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: params.signer, isSigner: true, isWritable: true },
+      { pubkey: userSavings, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.ownerTokenAccount, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.recipientTokenAccount, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.lendingAdmin, isSigner: false, isWritable: false },
+      { pubkey: params.jupiterAccounts.lending, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.mint, isSigner: false, isWritable: false },
+      { pubkey: params.jupiterAccounts.fTokenMint, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.supplyTokenReservesLiquidity, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.lendingSupplyPositionOnLiquidity, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.rateModel, isSigner: false, isWritable: false },
+      { pubkey: params.jupiterAccounts.vault, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.claimAccount, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.liquidity, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.liquidityProgram, isSigner: false, isWritable: true },
+      { pubkey: params.jupiterAccounts.rewardsRateModel, isSigner: false, isWritable: false },
+      { pubkey: params.jupiterAccounts.tokenProgram, isSigner: false, isWritable: false },
+      { pubkey: params.jupiterAccounts.associatedTokenProgram, isSigner: false, isWritable: false },
+      { pubkey: params.jupiterAccounts.systemProgram, isSigner: false, isWritable: false },
+      { pubkey: lendingProgramId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
 /**
  * Deserializes an on-chain UserSavings account buffer into a typed object
  */

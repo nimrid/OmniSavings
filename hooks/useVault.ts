@@ -30,6 +30,7 @@ export function useVault(asset: string = "USDC") {
   const [account, setAccount] = useState<VaultAccountData | null>(null);
   const [loading, setLoading] = useState(false);
   const [depositing, setDepositing] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
 
@@ -121,13 +122,67 @@ export function useVault(asset: string = "USDC") {
     }
   };
 
+  const withdrawFromVault = async (amountInTokens: number) => {
+    if (!primaryWallet?.address) {
+      throw new Error("No connected Solana wallet. Please sign in or connect.");
+    }
+
+    setWithdrawing(true);
+    setError(null);
+    setTxSignature(null);
+
+    try {
+      const baseUnits = BigInt(Math.round(amountInTokens * 1e6)).toString();
+
+      const res = await fetch("/api/vault/withdraw", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          signer: primaryWallet.address,
+          asset,
+          amount: baseUnits,
+        }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Vault withdrawal failed: ${res.statusText}`);
+      }
+
+      const { transaction: txBase64 } = (await res.json()) as { transaction: string };
+      const txBytes = Uint8Array.from(Buffer.from(txBase64, "base64"));
+
+      const sendRes = await signAndSendTransaction({
+        transaction: txBytes,
+        wallet: primaryWallet as any,
+      });
+
+      const signature = getBase58Decoder().decode(sendRes.signature);
+      setTxSignature(signature);
+
+      setTimeout(() => {
+        void fetchAccount();
+      }, 2500);
+
+      return signature;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Withdrawal failed";
+      setError(msg);
+      throw err;
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
   return {
     account,
     loading,
     depositing,
+    withdrawing,
     error,
     txSignature,
     refetch: fetchAccount,
     depositToVault,
+    withdrawFromVault,
   };
 }

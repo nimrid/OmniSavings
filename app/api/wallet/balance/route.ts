@@ -35,17 +35,30 @@ export async function GET(request: Request): Promise<NextResponse> {
     const usdtAta = getAta(owner, USDT_MINT);
     const jlUsdcAta = getAta(owner, JL_USDC_MINT);
 
-    const [solLamports, usdcResult, usdtResult, jlUsdcResult] = await Promise.all([
+    const luloApiKey = process.env.LULO_API_KEY;
+    const luloPromise = luloApiKey
+      ? fetch(`https://api.lulo.fi/v1/account.getAccount?owner=${owner.toBase58()}`, {
+          headers: { "x-api-key": luloApiKey },
+          cache: "no-store",
+        })
+          .then(async (r) => (r.ok ? ((await r.json()) as any) : null))
+          .catch(() => null)
+      : Promise.resolve(null);
+
+    const [solLamports, usdcResult, usdtResult, jlUsdcResult, luloAccount] = await Promise.all([
       connection.getBalance(owner).catch(() => 0),
       connection.getTokenAccountBalance(usdcAta).catch(() => null),
       connection.getTokenAccountBalance(usdtAta).catch(() => null),
       connection.getTokenAccountBalance(jlUsdcAta).catch(() => null),
+      luloPromise,
     ]);
 
     const sol = Number(solLamports) / 1e9;
     const usdc = usdcResult?.value?.uiAmount ?? 0;
     const usdt = usdtResult?.value?.uiAmount ?? 0;
     const jlUsdc = jlUsdcResult?.value?.uiAmount ?? 0;
+    const luloProtected = Number(luloAccount?.pusdUsdBalance ?? 0);
+    const luloRegular = Number(luloAccount?.lusdUsdBalance ?? 0);
 
     return NextResponse.json({
       address: owner.toBase58(),
@@ -53,6 +66,8 @@ export async function GET(request: Request): Promise<NextResponse> {
       usdc,
       usdt,
       jlUsdc,
+      luloProtected,
+      luloRegular,
     });
   } catch (err) {
     return NextResponse.json(

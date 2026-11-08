@@ -82,12 +82,12 @@ function WalletItem({ wallet }: { wallet: ConnectedSolanaWallet }) {
         </div>
 
         {balance && balance.jlUsdc > 0 && (
-          <div className="col-span-2 rounded bg-emerald-50/70 p-1.5 border border-emerald-100 flex items-center justify-between">
+          <div className="col-span-2 rounded bg-indigo-50/70 p-1.5 border border-indigo-100 flex items-center justify-between">
             <div>
-              <span className="text-emerald-700 font-medium block text-[10px]">
-                Jupiter Earn (jlUSDC)
+              <span className="text-indigo-700 font-medium block text-[10px]">
+                Jupiter Earn CPI (jlUSDC)
               </span>
-              <span className="font-bold text-emerald-900 tabular-nums">
+              <span className="font-bold text-indigo-900 tabular-nums">
                 {balance.jlUsdc.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 4,
@@ -95,8 +95,46 @@ function WalletItem({ wallet }: { wallet: ConnectedSolanaWallet }) {
                 shares
               </span>
             </div>
-            <span className="text-[10px] bg-emerald-200/70 text-emerald-800 px-1.5 py-0.5 rounded font-semibold">
+            <span className="text-[10px] bg-indigo-200/70 text-indigo-800 px-1.5 py-0.5 rounded font-semibold">
               Earning
+            </span>
+          </div>
+        )}
+
+        {balance && (balance.luloProtected ?? 0) > 0 && (
+          <div className="col-span-2 rounded bg-emerald-50/70 p-1.5 border border-emerald-100 flex items-center justify-between">
+            <div>
+              <span className="text-emerald-700 font-medium block text-[10px]">
+                Lulo Protected Savings
+              </span>
+              <span className="font-bold text-emerald-900 tabular-nums">
+                ${(balance.luloProtected ?? 0).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            <span className="text-[10px] bg-emerald-200/70 text-emerald-800 px-1.5 py-0.5 rounded font-semibold">
+              Protected Yield
+            </span>
+          </div>
+        )}
+
+        {balance && (balance.luloRegular ?? 0) > 0 && (
+          <div className="col-span-2 rounded bg-emerald-50/70 p-1.5 border border-emerald-100 flex items-center justify-between">
+            <div>
+              <span className="text-emerald-700 font-medium block text-[10px]">
+                Lulo Regular Savings
+              </span>
+              <span className="font-bold text-emerald-900 tabular-nums">
+                ${(balance.luloRegular ?? 0).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            <span className="text-[10px] bg-emerald-200/70 text-emerald-800 px-1.5 py-0.5 rounded font-semibold">
+              Flexible
             </span>
           </div>
         )}
