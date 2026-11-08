@@ -38,7 +38,10 @@ export async function GET(request: Request): Promise<NextResponse> {
     const luloApiKey = process.env.LULO_API_KEY;
     const luloPromise = luloApiKey
       ? fetch(`https://api.lulo.fi/v1/account.getAccount?owner=${owner.toBase58()}`, {
-          headers: { "x-api-key": luloApiKey },
+          headers: {
+            "x-api-key": luloApiKey,
+            "Content-Type": "application/json",
+          },
           cache: "no-store",
         })
           .then(async (r) => (r.ok ? ((await r.json()) as any) : null))
@@ -59,6 +62,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const jlUsdc = jlUsdcResult?.value?.uiAmount ?? 0;
     const luloProtected = Number(luloAccount?.pusdUsdBalance ?? 0);
     const luloRegular = Number(luloAccount?.lusdUsdBalance ?? 0);
+    const luloTotalInterest = Number(luloAccount?.totalInterestEarned ?? 0);
 
     return NextResponse.json({
       address: owner.toBase58(),
@@ -68,6 +72,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       jlUsdc,
       luloProtected,
       luloRegular,
+      luloTotalInterest,
     });
   } catch (err) {
     return NextResponse.json(
@@ -81,4 +86,3 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 }
-

@@ -222,12 +222,12 @@ export function LuloDepositModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-sm"
     >
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-slate-200">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-2xl border border-slate-200">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-white shrink-0">
               {isProtected ? (
                 <ShieldCheck className="h-4 w-4 text-emerald-300" />
               ) : (
@@ -249,7 +249,7 @@ export function LuloDepositModal({
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 font-mono text-sm p-1"
+            className="text-slate-400 hover:text-slate-600 font-mono text-base p-1.5"
           >
             ✕
           </button>
@@ -265,7 +265,7 @@ export function LuloDepositModal({
               setTxSignature(null);
               setAmount("10");
             }}
-            className={`pb-2 px-3 font-semibold transition-colors border-b-2 ${
+            className={`flex-1 pb-2 text-center font-semibold transition-colors border-b-2 ${
               activeTab === "deposit"
                 ? "border-emerald-600 text-emerald-700"
                 : "border-transparent text-slate-500 hover:text-slate-800"
@@ -283,7 +283,7 @@ export function LuloDepositModal({
                 setAmount(maxWithdrawable.toString());
               }
             }}
-            className={`pb-2 px-3 font-semibold transition-colors border-b-2 ${
+            className={`flex-1 pb-2 text-center font-semibold transition-colors border-b-2 ${
               activeTab === "withdraw"
                 ? "border-emerald-600 text-emerald-700"
                 : "border-transparent text-slate-500 hover:text-slate-800"
@@ -337,13 +337,13 @@ export function LuloDepositModal({
               </div>
 
               {/* Quick Presets */}
-              <div className="mt-2 flex gap-1.5 font-mono text-xs">
+              <div className="mt-2 flex flex-wrap gap-1.5 font-mono text-xs">
                 {["10", "25", "50", "100", "250"].map((val) => (
                   <button
                     key={val}
                     type="button"
                     onClick={() => setAmount(val)}
-                    className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-slate-700 hover:bg-slate-100"
+                    className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 hover:bg-slate-100"
                   >
                     ${val}
                   </button>
@@ -415,9 +415,9 @@ export function LuloDepositModal({
           </div>
 
           {txSignature && (
-            <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-xs text-emerald-950 flex items-center justify-between">
+            <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-xs text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 font-semibold">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                 <span>
                   {activeTab === "deposit"
                     ? "Deposit confirmed on Solana!"
@@ -447,7 +447,7 @@ export function LuloDepositModal({
         <div className="mt-6 flex justify-end gap-2 font-mono text-xs">
           <button
             onClick={onClose}
-            className="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-50"
+            className="flex-1 sm:flex-none rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-50"
           >
             {txSignature ? "Close" : "Cancel"}
           </button>
@@ -455,7 +455,7 @@ export function LuloDepositModal({
             <button
               onClick={activeTab === "deposit" ? handleDeposit : handleWithdraw}
               disabled={submitting || !primaryWallet}
-              className="rounded-lg bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800 disabled:opacity-50 shadow-sm transition-colors"
+              className="flex-1 sm:flex-none rounded-lg bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800 disabled:opacity-50 shadow-sm transition-colors"
             >
               {submitting
                 ? "Signing & Submitting…"

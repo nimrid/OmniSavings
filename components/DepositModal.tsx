@@ -235,18 +235,18 @@ export function DepositModal({ asset, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl border border-slate-200"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-4 sm:p-6 shadow-2xl border border-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-white shrink-0">
               <Globe className="h-4 w-4 text-emerald-300" />
             </div>
             <div>
@@ -254,13 +254,13 @@ export function DepositModal({ asset, onClose }: Props) {
                 Fund Wallet with {asset}
               </h2>
               <p className="text-xs text-slate-500 font-mono">
-                Cross-Chain Inflow via Aurora Intents (8+ EVM Chains)
+                Cross-Chain Inflow via Aurora Intents (8+ Chains)
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 font-mono text-sm p-1"
+            className="text-slate-400 hover:text-slate-600 font-mono text-base p-1.5"
             aria-label="Close"
           >
             ✕

@@ -24,7 +24,7 @@ export function ConnectButton() {
 
   if (!ready) {
     return (
-      <div className="h-9 w-28 rounded-lg bg-slate-100 animate-pulse border border-slate-200" />
+      <div className="h-8 w-24 rounded-lg bg-slate-100 animate-pulse border border-slate-200" />
     );
   }
 
@@ -32,10 +32,11 @@ export function ConnectButton() {
     return (
       <button
         onClick={() => void login()}
-        className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors font-mono"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors font-mono shrink-0"
       >
         <Wallet className="h-3.5 w-3.5" />
-        <span>Connect Wallet</span>
+        <span className="hidden xs:inline sm:inline">Connect</span>
+        <span className="inline xs:hidden sm:hidden">Connect</span>
       </button>
     );
   }
@@ -45,16 +46,16 @@ export function ConnectButton() {
     : user?.email?.address || "Connected";
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
       <div
-        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-2xs font-mono"
+        className="inline-flex items-center gap-1.5 sm:gap-2 rounded-lg border border-slate-200 bg-white px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs shadow-2xs font-mono"
         title={primaryWallet?.address || user?.email?.address || "Connected"}
       >
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
         </span>
-        <span className="font-semibold text-slate-800">{displayText}</span>
+        <span className="font-semibold text-slate-800 text-[11px] sm:text-xs">{displayText}</span>
         {primaryWallet?.address && (
           <button
             onClick={handleCopy}
@@ -72,7 +73,7 @@ export function ConnectButton() {
 
       <button
         onClick={() => void logout()}
-        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors shadow-2xs"
+        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 sm:p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors shadow-2xs"
         title="Disconnect"
       >
         <LogOut className="h-3.5 w-3.5" />

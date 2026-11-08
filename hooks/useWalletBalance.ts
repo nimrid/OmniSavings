@@ -9,6 +9,7 @@ export interface WalletBalance {
   jlUsdc: number;
   luloProtected?: number;
   luloRegular?: number;
+  luloTotalInterest?: number;
 }
 
 export function useWalletBalance(address?: string) {

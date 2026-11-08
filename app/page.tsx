@@ -10,6 +10,7 @@ import {
   Zap,
   Terminal,
 } from "lucide-react";
+import { StockIcon } from "@/components/StockIcon";
 
 const PROTOCOL_SPECS = [
   {
@@ -44,42 +45,42 @@ const PROTOCOL_SPECS = [
 
 export default function HomePage() {
   return (
-    <div className="space-y-12 py-4">
+    <div className="space-y-10 sm:space-y-12 py-2 sm:py-4">
       {/* Hero Section */}
-      <div className="space-y-6 max-w-4xl">
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-xs text-slate-700 shadow-2xs">
+      <div className="space-y-5 sm:space-y-6 max-w-4xl">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-[11px] sm:text-xs text-slate-700 shadow-2xs flex-wrap">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-semibold">Solana Mainnet</span>
-          <span className="text-slate-300">•</span>
-          <span>Anchor CPI Vault ID: AhYUb1…ktTT</span>
+          <span className="text-slate-300 hidden xs:inline">•</span>
+          <span className="truncate max-w-[200px] xs:max-w-none">Anchor Program: AhYUb1…ktTT</span>
         </div>
 
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl font-sans leading-[1.1]">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 font-sans leading-[1.15]">
           Autonomous Solana Savings & <br className="hidden sm:inline" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-slate-900 to-indigo-800">
             Yield-to-Equity Engine
           </span>
         </h1>
 
-        <p className="text-base sm:text-lg leading-relaxed text-slate-600 max-w-3xl">
+        <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-slate-600 max-w-3xl">
           Compare institutional stablecoin rates in real time, deposit via our on-chain{" "}
           <strong className="text-slate-900 font-semibold">Jupiter Lend CPI Vault</strong>, and autonomously deploy
           accrued interest into <strong className="text-slate-900 font-semibold">Token-2022 US equities</strong> via
           Jupiter V6. Zero principal drawdown risk.
         </p>
 
-        {/* Primary Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-2 font-mono text-xs">
+        {/* Primary Action Buttons (Mobile Full Width) */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-2 font-mono text-xs">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white shadow-md hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white shadow-md hover:bg-slate-800 active:bg-black transition-colors"
           >
             <span>Launch Savings Terminal</span>
             <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
           </Link>
           <Link
             href="/invest"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             <TrendingUp className="h-3.5 w-3.5 text-indigo-600" />
             <span>Yield-to-Equity Desk</span>
@@ -88,7 +89,7 @@ export default function HomePage() {
             href="https://solscan.io/account/AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-600 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-600 hover:text-slate-900 transition-colors"
           >
             <span>Verified Program on Solscan</span>
             <ExternalLink className="h-3 w-3" />
@@ -97,69 +98,72 @@ export default function HomePage() {
       </div>
 
       {/* Real-Time Live Architecture Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 font-mono text-xs">
-        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
-          <span className="text-slate-400 block text-[10px] uppercase">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-4 font-mono text-xs">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-sm">
+          <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase">
             Net Stablecoin APY
           </span>
-          <span className="text-lg font-bold text-slate-900 mt-1 block tabular-nums">
+          <span className="text-base sm:text-lg font-bold text-slate-900 mt-1 block tabular-nums">
             4.79% – 5.15%
           </span>
-          <span className="text-[10px] text-emerald-700 mt-0.5 block font-sans">
+          <span className="text-[10px] text-emerald-700 mt-0.5 block font-sans truncate">
             Anchor CPI + Lulo Protected
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
-          <span className="text-slate-400 block text-[10px] uppercase">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-sm">
+          <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase">
             Tokenized Equities
           </span>
-          <span className="text-lg font-bold text-slate-900 mt-1 block">
-            SPY • NVDA • AAPL
-          </span>
-          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans">
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <StockIcon symbol="SPY" size={16} />
+            <StockIcon symbol="NVDA" size={16} />
+            <StockIcon symbol="AAPL" size={16} />
+            <StockIcon symbol="TSLA" size={16} />
+          </div>
+          <span className="text-[10px] text-slate-500 mt-1 block font-sans truncate">
             Token-2022 (Backed xStocks)
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
-          <span className="text-slate-400 block text-[10px] uppercase">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-sm">
+          <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase">
             Cross-Chain Inflow
           </span>
-          <span className="text-lg font-bold text-slate-900 mt-1 block">
+          <span className="text-base sm:text-lg font-bold text-slate-900 mt-1 block">
             8+ EVM Chains
           </span>
-          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans">
+          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans truncate">
             Aurora Intents Protocol
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
-          <span className="text-slate-400 block text-[10px] uppercase">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-sm">
+          <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase">
             Custody Model
           </span>
-          <span className="text-lg font-bold text-slate-900 mt-1 block">
-            100% Self-Custodial
+          <span className="text-base sm:text-lg font-bold text-slate-900 mt-1 block truncate">
+            Self-Custodial
           </span>
-          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans">
-            Privy Embedded Solana Wallet
+          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans truncate">
+            Privy Embedded Wallet
           </span>
         </div>
       </div>
 
       {/* Execution Pipeline Architecture */}
-      <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm space-y-6">
-        <div className="border-b border-slate-100 pb-4">
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-sm space-y-5">
+        <div className="border-b border-slate-100 pb-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono">
             System Architecture
           </span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-1 font-sans">
             How the Autonomous Savings & Equity Loop Works
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 text-xs">
-          <div className="space-y-3 p-4 rounded-lg border border-slate-200 bg-slate-50/70">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 text-xs">
+          <div className="space-y-2.5 p-4 rounded-xl border border-slate-200 bg-slate-50/70">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white font-mono font-bold text-sm">
               01
             </div>
@@ -171,7 +175,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-3 p-4 rounded-lg border border-slate-200 bg-slate-50/70">
+          <div className="space-y-2.5 p-4 rounded-xl border border-slate-200 bg-slate-50/70">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900 text-white font-mono font-bold text-sm">
               02
             </div>
@@ -183,7 +187,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-3 p-4 rounded-lg border border-slate-200 bg-slate-50/70">
+          <div className="space-y-2.5 p-4 rounded-xl border border-slate-200 bg-slate-50/70">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-white font-mono font-bold text-sm">
               03
             </div>
@@ -199,17 +203,17 @@ export default function HomePage() {
 
       {/* Verifiable Protocol Specifications */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-slate-900">
+        <h2 className="text-base sm:text-lg font-bold text-slate-900 font-sans">
           Live On-Chain Smart Contracts & Infrastructure
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2">
           {PROTOCOL_SPECS.map((spec) => (
             <div
               key={spec.name}
-              className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm space-y-2.5"
+              className="rounded-xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-sm space-y-2.5"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 text-sm">{spec.name}</span>
+              <div className="flex items-center justify-between flex-wrap gap-1">
+                <span className="font-bold text-slate-900 text-sm font-sans">{spec.name}</span>
                 <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-mono font-semibold text-slate-700">
                   {spec.type}
                 </span>
@@ -218,7 +222,7 @@ export default function HomePage() {
                 {spec.desc}
               </p>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
-                <span className="text-slate-400 text-[11px] truncate max-w-[200px]" title={spec.target}>
+                <span className="text-slate-400 text-[11px] truncate max-w-[180px] sm:max-w-[220px]" title={spec.target}>
                   {spec.target}
                 </span>
                 <a
@@ -242,7 +246,7 @@ export default function HomePage() {
           <Terminal className="h-4 w-4 text-slate-700" />
           <span>Verifiable Hackathon Build Details</span>
         </div>
-        <p className="text-[11px] text-slate-600">
+        <p className="text-[11px] text-slate-600 break-all">
           Anchor Contract Program ID: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-indigo-700 font-bold">AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT</code>. Compiled to Solana BPF bytecode, exposing instructions <code className="bg-white px-1 py-0.5 rounded border border-slate-200">initialize_user_savings</code>, <code className="bg-white px-1 py-0.5 rounded border border-slate-200">deposit_to_jupiter</code>, and <code className="bg-white px-1 py-0.5 rounded border border-slate-200">withdraw_from_jupiter</code>.
         </p>
       </div>

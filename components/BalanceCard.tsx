@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Lock,
   Coins,
+  TrendingUp,
 } from "lucide-react";
 import { useConnectedWallets, type ConnectedSolanaWallet } from "@/hooks/useConnectedWallets";
 import { useWalletBalance } from "@/hooks/useWalletBalance";
@@ -31,7 +32,7 @@ function WalletItem({ wallet }: { wallet: ConnectedSolanaWallet }) {
   };
 
   return (
-    <li className="rounded-lg border border-slate-200 bg-slate-50/70 p-3.5 text-xs font-mono">
+    <li className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-xs font-mono">
       <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
         <div className="flex items-center gap-1.5 font-sans">
           <span className="font-semibold text-slate-900">{wallet.label}</span>
@@ -89,7 +90,7 @@ function WalletItem({ wallet }: { wallet: ConnectedSolanaWallet }) {
       {/* Live Balances Grid */}
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
         <div className="rounded bg-white p-2 border border-slate-200">
-          <span className="text-slate-400 block text-[10px] uppercase">SOL Gas</span>
+          <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase">SOL Gas</span>
           <span className="font-bold text-slate-800 tabular-nums text-xs">
             {loading && !balance
               ? "…"
@@ -100,7 +101,7 @@ function WalletItem({ wallet }: { wallet: ConnectedSolanaWallet }) {
         </div>
 
         <div className="rounded bg-white p-2 border border-slate-200">
-          <span className="text-slate-400 block text-[10px] uppercase">Liquid USDC</span>
+          <span className="text-slate-400 block text-[9px] sm:text-[10px] uppercase">Liquid USDC</span>
           <span className="font-bold text-slate-900 tabular-nums text-xs">
             {loading && !balance
               ? "…"
@@ -169,6 +170,18 @@ function WalletItem({ wallet }: { wallet: ConnectedSolanaWallet }) {
             </span>
           </div>
         )}
+
+        {balance && (balance.luloTotalInterest ?? 0) > 0 && (
+          <div className="col-span-2 rounded bg-emerald-50/60 p-2 border border-emerald-200 flex items-center justify-between">
+            <span className="text-[10px] text-emerald-800 font-semibold font-sans flex items-center gap-1">
+              <TrendingUp className="h-3 w-3 text-emerald-600" />
+              Lulo Total Yield Earned
+            </span>
+            <span className="font-bold text-emerald-900 text-xs tabular-nums">
+              +${(balance.luloTotalInterest ?? 0).toFixed(4)}
+            </span>
+          </div>
+        )}
       </div>
     </li>
   );
@@ -181,7 +194,7 @@ export function BalanceCard() {
   return (
     <section className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 font-sans">
           <Wallet className="h-4 w-4 text-slate-700" />
           <span>Connected Wallets</span>
         </h2>
@@ -196,7 +209,7 @@ export function BalanceCard() {
         <p className="mt-3 text-xs text-slate-500 font-mono">Loading telemetry…</p>
       ) : !authenticated ? (
         <div className="mt-3">
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed font-sans">
             No wallet connected yet. Sign in with Google, email, or connect a Solana wallet.
           </p>
           <button
@@ -212,7 +225,7 @@ export function BalanceCard() {
           <span>Generating embedded Solana wallet…</span>
         </div>
       ) : wallets.length === 0 ? (
-        <p className="mt-3 text-xs text-slate-600">
+        <p className="mt-3 text-xs text-slate-600 font-sans">
           No Solana wallet linked to your session. Re-authenticate to create an embedded wallet.
         </p>
       ) : (

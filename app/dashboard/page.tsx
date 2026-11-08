@@ -18,7 +18,6 @@ import { formatPct } from "@/lib/utils/format";
 import { YieldTable } from "@/components/YieldTable";
 import { DepositModal } from "@/components/DepositModal";
 import { VaultCard } from "@/components/VaultCard";
-import { YieldToEquityCard } from "@/components/YieldToEquityCard";
 
 const BalanceCard = dynamic(
   () => import("@/components/BalanceCard").then((m) => m.BalanceCard),
@@ -43,19 +42,19 @@ export default function DashboardPage() {
   const bestId = data?.best ? `${data.best.protocol}-${data.best.marketId}` : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Dashboard Top Header & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-sm">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="rounded border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-800">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="rounded border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[10px] sm:text-[11px] font-semibold text-slate-800">
               Institutional DeFi
             </span>
-            <span className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[11px] font-semibold text-emerald-800">
+            <span className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] sm:text-[11px] font-semibold text-emerald-800">
               Solana Mainnet
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="mt-1 text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 font-sans">
             Solana Savings & Yield Terminal
           </h1>
           <p className="mt-1 text-xs text-slate-500">
@@ -63,14 +62,14 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Currency & Action Toolbar */}
-        <div className="flex items-center gap-2 font-mono">
+        {/* Currency & Action Toolbar (Mobile-Responsive) */}
+        <div className="flex flex-wrap items-center gap-2 font-mono text-xs w-full sm:w-auto">
           <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
             {ASSETS.map((a) => (
               <button
                 key={a}
                 onClick={() => setAsset(a)}
-                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                className={`rounded-md px-3 py-1 font-semibold transition-colors ${
                   asset === a
                     ? "bg-slate-900 text-white shadow-2xs"
                     : "text-slate-600 hover:text-slate-900"
@@ -85,15 +84,15 @@ export default function DashboardPage() {
             onClick={() => void refetch()}
             disabled={loading}
             title="Refresh Quotes"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 active:bg-slate-100 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">Refresh</span>
+            <span>Refresh</span>
           </button>
 
           <button
             onClick={() => setFundOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-800 transition-colors"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-700 px-3.5 py-2 font-semibold text-white shadow-sm hover:bg-emerald-800 active:bg-emerald-900 transition-colors"
           >
             <ArrowDownLeft className="h-3.5 w-3.5" />
             <span>Fund Wallet (Intents)</span>
@@ -103,14 +102,14 @@ export default function DashboardPage() {
 
       {/* KPI Highlight Strip */}
       {data?.best && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-2xs">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-2xs shrink-0">
               <Zap className="h-4 w-4" />
             </div>
             <div>
               <span className="font-semibold text-emerald-950 block">
-                Highest Yield Market Right Now: {formatPct(data.best.apyNet)} APY on {data.best.market}
+                Top Yield Market: {formatPct(data.best.apyNet)} APY on {data.best.market}
               </span>
               <span className="text-[11px] text-emerald-800 font-mono">
                 Protocol: {data.best.protocol.toUpperCase()} • Settlement: {data.best.chain.toUpperCase()} Mainnet
@@ -129,8 +128,8 @@ export default function DashboardPage() {
       )}
 
       {/* Grid Layout: Main Columns (Vault + Yield Table) vs Sidebar */}
-      <div className="grid gap-6 lg:grid-cols-[1fr_310px]">
-        <div className="space-y-6">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_310px]">
+        <div className="space-y-5 sm:space-y-6">
           {/* On-Chain Anchor CPI Vault Card */}
           <VaultCard
             asset={asset}
@@ -143,7 +142,7 @@ export default function DashboardPage() {
           {/* Comparative Yield Matrix */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 font-sans">
                 <Layers className="h-4 w-4 text-slate-700" />
                 <span>Live Comparative Lending Markets</span>
               </h2>
@@ -167,12 +166,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Yield-to-Equity Desk Teaser / Integration */}
-          <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="rounded-xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-emerald-600" />
-                  <h3 className="font-bold text-slate-900 text-sm">
+                  <h3 className="font-bold text-slate-900 text-sm font-sans">
                     Yield-to-Equity Auto-Allocation
                   </h3>
                   <span className="rounded bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[9px] font-bold uppercase font-mono">
@@ -186,7 +185,7 @@ export default function DashboardPage() {
 
               <Link
                 href="/invest"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors font-mono"
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors font-mono"
               >
                 <span>Open Equity Desk</span>
                 <ArrowRight className="h-3.5 w-3.5" />

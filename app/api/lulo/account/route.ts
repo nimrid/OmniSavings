@@ -14,6 +14,7 @@ export interface LuloAccountResponse {
   protectedInterestEarned: number;
   regularInterestEarned: number;
   blockTime: number;
+  raw?: any;
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -39,32 +40,16 @@ export async function GET(request: Request): Promise<NextResponse> {
     const res = await fetch(
       `${LULO_API_BASE}/v1/account.getAccount?owner=${owner.trim()}`,
       {
-        headers: { "x-api-key": apiKey },
+        headers: {
+          "x-api-key": apiKey,
+          "Content-Type": "application/json",
+        },
         cache: "no-store",
       }
     );
 
     if (!res.ok) {
-      return NextResponse.json(
-        {
-          totalUsdValue: 0,
-          lusdUsdBalance: 0,
-          pusdUsdBalance: 0,
-          maxWithdrawable: { protected: {}, regular: {} },
-          totalInterestEarned: 0,
-          protectedInterestEarned: 0,
-          regularInterestEarned: 0,
-          blockTime: Math.floor(Date.now() / 1000),
-        },
-        { status: 200 }
-      );
-    }
-
-    const data = (await res.json()) as LuloAccountResponse;
-    return NextResponse.json(data);
-  } catch (err) {
-    return NextResponse.json(
-      {
+      return NextResponse.json({
         totalUsdValue: 0,
         lusdUsdBalance: 0,
         pusdUsdBalance: 0,
@@ -73,10 +58,36 @@ export async function GET(request: Request): Promise<NextResponse> {
         protectedInterestEarned: 0,
         regularInterestEarned: 0,
         blockTime: Math.floor(Date.now() / 1000),
-        error: err instanceof Error ? err.message : "Failed to fetch Lulo account",
+      });
+    }
+
+    const data = (await res.json().catch(() => ({}))) as any;
+
+    return NextResponse.json({
+      totalUsdValue: Number(data?.totalUsdValue ?? 0),
+      lusdUsdBalance: Number(data?.lusdUsdBalance ?? 0),
+      pusdUsdBalance: Number(data?.pusdUsdBalance ?? 0),
+      maxWithdrawable: {
+        protected: data?.maxWithdrawable?.protected ?? {},
+        regular: data?.maxWithdrawable?.regular ?? {},
       },
-      { status: 200 }
-    );
+      totalInterestEarned: Number(data?.totalInterestEarned ?? 0),
+      protectedInterestEarned: Number(data?.protectedInterestEarned ?? 0),
+      regularInterestEarned: Number(data?.regularInterestEarned ?? 0),
+      blockTime: Number(data?.blockTime ?? Math.floor(Date.now() / 1000)),
+      raw: data,
+    });
+  } catch (err) {
+    return NextResponse.json({
+      totalUsdValue: 0,
+      lusdUsdBalance: 0,
+      pusdUsdBalance: 0,
+      maxWithdrawable: { protected: {}, regular: {} },
+      totalInterestEarned: 0,
+      protectedInterestEarned: 0,
+      regularInterestEarned: 0,
+      blockTime: Math.floor(Date.now() / 1000),
+      error: err instanceof Error ? err.message : "Failed to fetch Lulo account",
+    });
   }
 }
-
