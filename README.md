@@ -89,7 +89,10 @@ Seeded by `[b"user_savings", signer.key(), mint.key()]`:
 * **Smart Contracts**: Solana SBF, Anchor 1.2.0, Rust 1.89 / 1.95 SBF, LiteSVM.
 * **Wallets & Auth**: Privy React SDK (`@privy-io/react-auth`, `@privy-io/react-auth/solana`).
 * **Cross-Chain Bridge**: Aurora Intents API (`https://intents-api.aurora.dev`).
-* **DeFi Integrations**: Jupiter Lend Earn CPI (`@jup-ag/lend`), Lulo Rates API.
+* **DeFi Integrations**:
+  - **Jupiter Lend Earn**: On-chain Anchor CPI integration (`deposit_to_jupiter` & `withdraw_from_jupiter`) targeting `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`.
+  - **Lulo REST API**: Rate analytics (`rates.getRates`), account tracking (`account.getAccount`), and Versioned V0 transaction generation (`generate.transactions.deposit` & `generate.transactions.withdrawProtected`).
+* **RPC Infrastructure**: Alchemy Solana Mainnet high-throughput RPC (`solana-mainnet.g.alchemy.com`).
 
 ---
 
