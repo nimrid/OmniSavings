@@ -196,3 +196,4 @@ export function StockIcon({ symbol, size = 28, className = "" }: StockIconProps)
     </div>
   );
 }
+
