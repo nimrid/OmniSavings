@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <Providers>
           <header className="border-b border-slate-200 bg-white">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
