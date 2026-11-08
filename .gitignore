@@ -7,3 +7,18 @@ dist/
 .env
 .env*.local
 onchain/target/
+
+# Video & Demo Generation files
+demo-video/
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.aiff
+*.m4a
+*.aac
+.remotion/
+render_final_video.py
