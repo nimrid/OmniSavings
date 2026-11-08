@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowDownLeft, ArrowUpRight, ShieldCheck, Zap, ExternalLink } from "lucide-react";
 import type { YieldQuote } from "@/lib/protocols/types";
 import { formatPct, formatUsd } from "@/lib/utils/format";
 import { LuloDepositModal } from "./LuloDepositModal";
@@ -11,9 +12,22 @@ interface Props {
   onOpenJupiterVault?: () => void;
 }
 
-const PROTOCOL_LABEL: Record<YieldQuote["protocol"], string> = {
-  lulo: "Lulo",
-  jupiter: "Jupiter",
+const PROTOCOL_METADATA: Record<
+  YieldQuote["protocol"],
+  { name: string; tag: string; color: string; textColor: string }
+> = {
+  lulo: {
+    name: "Lulo",
+    tag: "Autonomous Lending",
+    color: "bg-emerald-50 border-emerald-200",
+    textColor: "text-emerald-800",
+  },
+  jupiter: {
+    name: "Jupiter Earn",
+    tag: "Anchor CPI Vault",
+    color: "bg-indigo-50 border-indigo-200",
+    textColor: "text-indigo-800",
+  },
 };
 
 export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
@@ -25,9 +39,9 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
 
   if (quotes.length === 0) {
     return (
-      <p className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">
-        No quotes available for this asset right now.
-      </p>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 text-center text-xs text-slate-500 font-mono">
+        No live market quotes available for this asset right now.
+      </div>
     );
   }
 
@@ -65,73 +79,115 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto rounded-xl border border-slate-200/90 bg-white shadow-sm">
+        <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 bg-slate-50/50">
-              <th className="px-4 py-3 font-medium">Protocol</th>
-              <th className="px-4 py-3 font-medium">Market</th>
-              <th className="px-4 py-3 font-medium">Chain</th>
-              <th className="px-4 py-3 text-right font-medium">Net APY</th>
-              <th className="px-4 py-3 text-right font-medium">TVL</th>
-              <th className="px-4 py-3 text-right font-medium">Source</th>
-              <th className="px-4 py-3 text-center font-medium">Action</th>
+            <tr className="border-b border-slate-200 bg-slate-50/70 text-[11px] font-mono uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3 font-semibold">Protocol / Contract</th>
+              <th className="px-4 py-3 font-semibold">Market Type</th>
+              <th className="px-4 py-3 font-semibold">Chain</th>
+              <th className="px-4 py-3 text-right font-semibold">Net APY</th>
+              <th className="px-4 py-3 text-right font-semibold">Total Liquidity</th>
+              <th className="px-4 py-3 text-right font-semibold">Telemetry</th>
+              <th className="px-4 py-3 text-center font-semibold">Execution</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 font-mono">
             {quotes.map((q) => {
               const id = `${q.protocol}-${q.marketId}`;
               const isBest = bestId === id;
               const isJupiter = q.protocol === "jupiter";
+              const isProtected = q.marketId.includes("protected") || q.market.toLowerCase().includes("protected");
+              const meta = PROTOCOL_METADATA[q.protocol] || {
+                name: q.protocol,
+                tag: "Lending",
+                color: "bg-slate-50 border-slate-200",
+                textColor: "text-slate-800",
+              };
+
               return (
-                <tr key={id} className={isBest ? "bg-emerald-50/60" : undefined}>
-                  <td className="px-4 py-3 font-semibold text-slate-900">
-                    <div className="flex items-center gap-1.5">
-                      <span>{PROTOCOL_LABEL[q.protocol]}</span>
+                <tr
+                  key={id}
+                  className={`hover:bg-slate-50/80 transition-colors ${
+                    isBest ? "bg-emerald-50/30" : ""
+                  }`}
+                >
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-2">
+                      <div className="font-sans font-bold text-slate-900 text-xs">
+                        {meta.name}
+                      </div>
                       {isBest && (
-                        <span className="rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                          Best
+                        <span className="rounded bg-emerald-700 px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider text-white">
+                          Top Rate
                         </span>
                       )}
                       {isJupiter && (
-                        <span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">
-                          CPI
+                        <span className="rounded border border-indigo-200 bg-indigo-50 px-1.5 py-0.2 text-[9px] font-bold text-indigo-700">
+                          Anchor CPI
                         </span>
                       )}
                     </div>
+                    <div className="text-[10px] text-slate-400 font-sans mt-0.5">
+                      {isJupiter
+                        ? "Jupiter Lend Earn (jlUSDC)"
+                        : isProtected
+                        ? "Lulo Protected Lending"
+                        : "Lulo Multi-Market Dynamic"}
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-slate-700">{q.market}</td>
-                  <td className="px-4 py-3 text-slate-600 font-mono text-xs uppercase">{q.chain}</td>
-                  <td className="px-4 py-3 text-right font-bold tabular-nums text-slate-900">
-                    {formatPct(q.apyNet)}
+
+                  <td className="px-4 py-3.5 font-sans">
+                    <span className="font-medium text-slate-800">{q.market}</span>
+                    {isProtected && (
+                      <span className="ml-1.5 inline-flex items-center gap-0.5 text-[10px] text-emerald-700 font-medium">
+                        <ShieldCheck className="h-3 w-3" />
+                        Protected
+                      </span>
+                    )}
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums text-slate-600">
+
+                  <td className="px-4 py-3.5 uppercase text-slate-500 text-[11px]">
+                    {q.chain}
+                  </td>
+
+                  <td className="px-4 py-3.5 text-right font-bold tabular-nums text-sm">
+                    <span className={isBest ? "text-emerald-700 font-extrabold" : "text-slate-900"}>
+                      {formatPct(q.apyNet)}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3.5 text-right tabular-nums text-slate-600">
                     {formatUsd(q.tvlUsd)}
                   </td>
-                  <td className="px-4 py-3 text-right text-xs text-slate-400">
+
+                  <td className="px-4 py-3.5 text-right text-[11px] text-slate-400">
                     {q.source}
                   </td>
-                  <td className="px-4 py-3 text-center">
+
+                  <td className="px-4 py-3.5 text-center">
                     <div className="flex items-center justify-center gap-1.5">
                       <button
                         onClick={() => handleDepositClick(q)}
-                        className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold shadow-sm transition-colors ${
+                        className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-2xs transition-colors ${
                           isJupiter
                             ? "bg-indigo-600 text-white hover:bg-indigo-700"
                             : "bg-emerald-700 text-white hover:bg-emerald-800"
                         }`}
                       >
-                        {isJupiter ? "Deposit (CPI)" : "Deposit"}
+                        <ArrowDownLeft className="h-3 w-3" />
+                        <span>Deposit</span>
                       </button>
                       <button
                         onClick={() => handleWithdrawClick(q)}
-                        className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold shadow-sm transition-colors ${
+                        className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs font-semibold shadow-2xs transition-colors ${
                           isJupiter
                             ? "border-indigo-300 text-indigo-700 hover:bg-indigo-50"
-                            : "border-emerald-300 text-emerald-800 hover:bg-emerald-50"
+                            : "border-slate-300 text-slate-700 hover:bg-slate-50"
                         }`}
                       >
-                        Withdraw
+                        <ArrowUpRight className="h-3 w-3" />
+                        <span>Withdraw</span>
                       </button>
                     </div>
                   </td>
@@ -142,7 +198,7 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
         </table>
       </div>
 
-      {/* Lulo Deposit / Withdraw Modal (Dedicated per market) */}
+      {/* Lulo Deposit / Withdraw Modal (Isolated per market) */}
       <LuloDepositModal
         open={luloModalOpen}
         onClose={() => setLuloModalOpen(false)}

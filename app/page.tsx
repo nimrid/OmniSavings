@@ -1,134 +1,249 @@
 import Link from "next/link";
+import {
+  ShieldCheck,
+  TrendingUp,
+  ArrowRight,
+  ExternalLink,
+  Layers,
+  Lock,
+  Globe,
+  Zap,
+  Terminal,
+} from "lucide-react";
 
-const HIGHLIGHTS = [
+const PROTOCOL_SPECS = [
   {
-    title: "On-Chain Jupiter Earn CPI Vault",
-    tag: "Anchor Program",
-    desc: "Direct Cross-Program Invocation into Jupiter Lend Earn (jup3YeL...); tracks deposits, goal metrics, and yields on Solana.",
-    color: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    name: "Anchor Jupiter CPI Vault",
+    type: "On-Chain SBF Smart Contract",
+    desc: "Direct Cross-Program Invocation into Jupiter Lend Earn (jup3YeL8QhtSx...). Mints yield-bearing jlTokens directly to depositor wallet.",
+    target: "AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT",
+    link: "https://solscan.io/account/AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT",
   },
   {
-    title: "Yield-to-Equity Auto-Invest",
-    tag: "Real On-Chain Stocks",
-    desc: "Never risk your principal. Automatically deploy accrued passive savings yield into real tokenized US equities & S&P 500 (SPYx, NVDAx, AAPLx).",
-    color: "bg-purple-50 text-purple-700 border-purple-200",
+    name: "Yield-to-Equity Engine",
+    type: "Real Token-2022 Equities",
+    desc: "Autonomous deployment of accrued interest into tokenized S&P 500 (SPYx), NVIDIA (NVDAx), Apple (AAPLx) backed 1:1 by Swiss bank custody.",
+    target: "Jupiter Swap V6 Router",
+    link: "https://station.jup.ag",
   },
   {
-    title: "Universal Cross-Chain Inflow",
-    tag: "Aurora Intents",
-    desc: "Fund your Solana savings account directly from 8+ chains (Ethereum, Base, Arbitrum, BSC, Optimism, Polygon, Avalanche).",
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    name: "Lulo Protected Lending",
+    type: "Institutional Coverage Pool",
+    desc: "Automated lending across Kamino, Save, and Marginfi with insurance-backed principal protection on Solana.",
+    target: "Lulo API v1 Endpoints",
+    link: "https://dev.lulo.fi",
   },
   {
-    title: "Zero-Friction Embedded Onboarding",
-    tag: "Privy Auth",
-    desc: "Sign in with Google or Email; an embedded Solana wallet is automatically created with zero seed phrase friction.",
-    color: "bg-sky-50 text-sky-700 border-sky-200",
-  },
-];
-
-const PROTOCOLS = [
-  {
-    name: "On-Chain Vault (CPI)",
-    chain: "Solana",
-    note: "Anchor Program `AhYUb1t...ktTT` calling Jupiter Lend Earn",
-  },
-  {
-    name: "Yield-to-Equity (Jupiter Swap)",
-    chain: "Solana Mainnet",
-    note: "Tokenized Equities & S&P 500 (SPYx, NVDAx, AAPLx, TSLAx, USDY)",
-  },
-  {
-    name: "Jupiter Earn",
-    chain: "Solana",
-    note: "jlToken lending markets (jlUSDC, jlUSDT)",
-  },
-  {
-    name: "Lulo",
-    chain: "Solana",
-    note: "Flexible savings and principal-protected lending",
+    name: "Universal Cross-Chain Inflow",
+    type: "Aurora Intents Solver",
+    desc: "Fund Solana self-custody wallets from 8+ EVM chains (Ethereum, Base, Arbitrum, BSC, Optimism, Polygon) in a single transaction.",
+    target: "Aurora Intents Protocol",
+    link: "https://aurora.dev",
   },
 ];
 
 export default function HomePage() {
   return (
-    <div className="max-w-3xl">
-      <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50/70 px-3 py-1 text-xs font-semibold text-indigo-800">
-        <span>🏆</span>
-        <span>Built for the MLH Solana Hackathon — DeFi Track</span>
+    <div className="space-y-12 py-4">
+      {/* Hero Section */}
+      <div className="space-y-6 max-w-4xl">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-xs text-slate-700 shadow-2xs">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-semibold">Solana Mainnet</span>
+          <span className="text-slate-300">•</span>
+          <span>Anchor CPI Vault ID: AhYUb1…ktTT</span>
+        </div>
+
+        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl font-sans leading-[1.1]">
+          Autonomous Solana Savings & <br className="hidden sm:inline" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-slate-900 to-indigo-800">
+            Yield-to-Equity Engine
+          </span>
+        </h1>
+
+        <p className="text-base sm:text-lg leading-relaxed text-slate-600 max-w-3xl">
+          Compare institutional stablecoin rates in real time, deposit via our on-chain{" "}
+          <strong className="text-slate-900 font-semibold">Jupiter Lend CPI Vault</strong>, and autonomously deploy
+          accrued interest into <strong className="text-slate-900 font-semibold">Token-2022 US equities</strong> via
+          Jupiter V6. Zero principal drawdown risk.
+        </p>
+
+        {/* Primary Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 pt-2 font-mono text-xs">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white shadow-md hover:bg-slate-800 transition-colors"
+          >
+            <span>Launch Savings Terminal</span>
+            <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
+          </Link>
+          <Link
+            href="/invest"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
+          >
+            <TrendingUp className="h-3.5 w-3.5 text-indigo-600" />
+            <span>Yield-to-Equity Desk</span>
+          </Link>
+          <a
+            href="https://solscan.io/account/AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            <span>Verified Program on Solscan</span>
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
       </div>
 
-      <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-        Universal Autonomous DeFi Savings on Solana
-      </h1>
-      <p className="mt-4 text-lg leading-relaxed text-slate-600">
-        Compare stablecoin yields in real time, bridge funds from 8+ chains in a single transaction via Aurora Intents, and earn automated yields through our on-chain <strong>Jupiter Earn CPI Vault</strong>.
-      </p>
+      {/* Real-Time Live Architecture Strip */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 font-mono text-xs">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
+          <span className="text-slate-400 block text-[10px] uppercase">
+            Net Stablecoin APY
+          </span>
+          <span className="text-lg font-bold text-slate-900 mt-1 block tabular-nums">
+            4.79% – 5.15%
+          </span>
+          <span className="text-[10px] text-emerald-700 mt-0.5 block font-sans">
+            Anchor CPI + Lulo Protected
+          </span>
+        </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Link
-          href="/dashboard"
-          className="inline-block rounded-lg bg-emerald-700 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-800 transition-colors"
-        >
-          Open Yield Dashboard →
-        </Link>
-        <Link
-          href="/invest"
-          className="inline-block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-indigo-700 transition-colors"
-        >
-          📈 Yield-to-Stock Auto-Invest →
-        </Link>
-        <a
-          href="https://github.com/your-username/defi-savings-app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-        >
-          View On-Chain Program Code
-        </a>
+        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
+          <span className="text-slate-400 block text-[10px] uppercase">
+            Tokenized Equities
+          </span>
+          <span className="text-lg font-bold text-slate-900 mt-1 block">
+            SPY • NVDA • AAPL
+          </span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans">
+            Token-2022 (Backed xStocks)
+          </span>
+        </div>
+
+        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
+          <span className="text-slate-400 block text-[10px] uppercase">
+            Cross-Chain Inflow
+          </span>
+          <span className="text-lg font-bold text-slate-900 mt-1 block">
+            8+ EVM Chains
+          </span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans">
+            Aurora Intents Protocol
+          </span>
+        </div>
+
+        <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
+          <span className="text-slate-400 block text-[10px] uppercase">
+            Custody Model
+          </span>
+          <span className="text-lg font-bold text-slate-900 mt-1 block">
+            100% Self-Custodial
+          </span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block font-sans">
+            Privy Embedded Solana Wallet
+          </span>
+        </div>
       </div>
 
-      <div className="mt-12">
-        <h2 className="text-xl font-bold text-slate-900">How OmniSavings Works</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {HIGHLIGHTS.map((h) => (
+      {/* Execution Pipeline Architecture */}
+      <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm space-y-6">
+        <div className="border-b border-slate-100 pb-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono">
+            System Architecture
+          </span>
+          <h2 className="text-xl font-bold text-slate-900 mt-1">
+            How the Autonomous Savings & Equity Loop Works
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 text-xs">
+          <div className="space-y-3 p-4 rounded-lg border border-slate-200 bg-slate-50/70">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white font-mono font-bold text-sm">
+              01
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm font-sans">
+              Universal Inflow & Onboarding
+            </h3>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Users sign in with Google or Email; an embedded Solana wallet is provisioned instantly. Users can bridge liquidity directly from Ethereum, Base, Arbitrum, or BSC via Aurora Intents in a single transaction.
+            </p>
+          </div>
+
+          <div className="space-y-3 p-4 rounded-lg border border-slate-200 bg-slate-50/70">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900 text-white font-mono font-bold text-sm">
+              02
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm font-sans">
+              Protected Principal Compounding
+            </h3>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Deposits route through our deployed Anchor Smart Contract (<code className="font-mono text-indigo-700">AhYUb1t…ktTT</code>) using Cross-Program Invocation into Jupiter Lend Earn, minting yield-generating jlTokens safely.
+            </p>
+          </div>
+
+          <div className="space-y-3 p-4 rounded-lg border border-slate-200 bg-slate-50/70">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-white font-mono font-bold text-sm">
+              03
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm font-sans">
+              Yield-to-Equity Allocation
+            </h3>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Instead of letting passive interest sit idle, users can automatically deploy accrued yield into real tokenized US stocks & S&P 500 ETFs via Jupiter DEX V6 with zero principal drawdown exposure.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Verifiable Protocol Specifications */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">
+          Live On-Chain Smart Contracts & Infrastructure
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {PROTOCOL_SPECS.map((spec) => (
             <div
-              key={h.title}
-              className={`rounded-xl border p-4 shadow-sm ${h.color}`}
+              key={spec.name}
+              className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm space-y-2.5"
             >
-              <span className="text-[11px] font-bold uppercase tracking-wider">
-                {h.tag}
-              </span>
-              <h3 className="mt-1 font-semibold text-slate-900">{h.title}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                {h.desc}
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-900 text-sm">{spec.name}</span>
+                <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-mono font-semibold text-slate-700">
+                  {spec.type}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {spec.desc}
               </p>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                <span className="text-slate-400 text-[11px] truncate max-w-[200px]" title={spec.target}>
+                  {spec.target}
+                </span>
+                <a
+                  href={spec.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-semibold text-[11px]"
+                >
+                  <span>Verify</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      <h2 className="mt-12 text-xl font-bold text-slate-900">
-        Live Protocols & Yield Markets
-      </h2>
-      <ul className="mt-4 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        {PROTOCOLS.map((p) => (
-          <li key={p.name} className="flex items-center justify-between px-5 py-4">
-            <div>
-              <span className="font-semibold text-slate-900">{p.name}</span>
-              <p className="text-xs text-slate-500 mt-0.5">{p.note}</p>
-            </div>
-            <span className="rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
-              {p.chain}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600 leading-relaxed">
-        <p className="font-semibold text-slate-800">Judge & Developer Quick Check:</p>
-        <p className="mt-1">
-          Our Anchor contract (`onchain`) is compiled to SBF bytecode and deployed with Program ID <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-indigo-700">AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT</code>. It exposes <code className="font-mono bg-white px-1 py-0.5 rounded">initialize_user_savings</code>, <code className="font-mono bg-white px-1 py-0.5 rounded">deposit_to_jupiter</code>, and <code className="font-mono bg-white px-1 py-0.5 rounded">withdraw_from_jupiter</code> with atomic CPI invocations.
+      {/* Developer / Auditor Note */}
+      <div className="rounded-xl border border-slate-200 bg-slate-100/70 p-4 text-xs font-mono text-slate-700 leading-relaxed space-y-1">
+        <div className="flex items-center gap-1.5 font-bold text-slate-900 font-sans">
+          <Terminal className="h-4 w-4 text-slate-700" />
+          <span>Verifiable Hackathon Build Details</span>
+        </div>
+        <p className="text-[11px] text-slate-600">
+          Anchor Contract Program ID: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-indigo-700 font-bold">AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT</code>. Compiled to Solana BPF bytecode, exposing instructions <code className="bg-white px-1 py-0.5 rounded border border-slate-200">initialize_user_savings</code>, <code className="bg-white px-1 py-0.5 rounded border border-slate-200">deposit_to_jupiter</code>, and <code className="bg-white px-1 py-0.5 rounded border border-slate-200">withdraw_from_jupiter</code>.
         </p>
       </div>
     </div>

@@ -52,7 +52,8 @@ export async function GET(request: Request): Promise<NextResponse> {
           mint: eq.mint,
           shares,
           category: eq.category,
-          icon: eq.icon,
+          issuer: eq.issuer,
+          tokenStandard: eq.tokenStandard,
         };
       })
     );

@@ -18,6 +18,7 @@ Traditional DeFi savings protocols on Solana face a severe adoption barrier:
 - **Zero-Friction Onboarding (Privy)**: Users sign in with Email or Social login; an embedded Solana wallet is created deterministically with zero seed-phrase anxiety.
 - **Universal Cross-Chain Deposits (Aurora Intents)**: Users fund their savings from **Ethereum, Base, Arbitrum, Optimism, Polygon, BSC, Avalanche, or Solana** in one step with exact decimal matching and status polling.
 - **Native On-Chain Yield Primitive (Anchor + Jupiter Earn CPI)**: User deposits trigger our custom on-chain program (`AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT`), which maintains verifiable `UserSavings` PDA state (cumulative deposits, deposit timestamps, savings goals) and executes an atomic **Cross-Program Invocation (CPI)** into **Jupiter Lend Earn** (`jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`).
+- **Yield-to-Equity Auto-Invest (No-Loss Stock Investing)**: Principal is never exposed to equity drawdowns. Accrued yield is automatically or 1-click routed via **Jupiter Swap V6** into real tokenized equities and index ETFs on Solana (**S&P 500 `SPYx`**, **NVIDIA `NVDAx`**, **Apple `AAPLx`**, **Tesla `TSLAx`**, **Ondo Treasuries `USDY`**), landing directly as verifiable SPL tokens in the user's wallet.
 
 ---
 
@@ -41,6 +42,12 @@ flowchart TD
         F -->|"CPI: global:deposit"| H["Jupiter Lend Earn Program<br/>(jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9)"]
         H -->|"Deposit Reserves"| I["Jupiter Liquidity Protocol<br/>(jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC)"]
         H -->|"Mint Receipt Shares"| J["User jlUSDC ATA (Yield Bearing)"]
+    end
+
+    subgraph YieldToEquity["4. Yield-to-Equity Auto-Invest"]
+        J -->|"Accrued Yield (USDC)"| K["Yield-to-Equity Engine"]
+        K -->|"Jupiter Swap V6 (Versioned V0)"| L["Tokenized Equities & S&P 500<br/>(SPYx, NVDAx, AAPLx, TSLAx)"]
+        L -->|"Self-Custodial SPL Tokens"| C
     end
 ```
 
@@ -91,6 +98,7 @@ Seeded by `[b"user_savings", signer.key(), mint.key()]`:
 * **Cross-Chain Bridge**: Aurora Intents API (`https://intents-api.aurora.dev`).
 * **DeFi Integrations**:
   - **Jupiter Lend Earn**: On-chain Anchor CPI integration (`deposit_to_jupiter` & `withdraw_from_jupiter`) targeting `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`.
+  - **Yield-to-Equity (Jupiter Swap V6)**: Direct on-chain swaps of savings yield into tokenized US Equities & S&P 500 (`SPYx`, `NVDAx`, `AAPLx`, `TSLAx`, `USDY`).
   - **Lulo REST API**: Rate analytics (`rates.getRates`), account tracking (`account.getAccount`), and Versioned V0 transaction generation (`generate.transactions.deposit` & `generate.transactions.withdrawProtected`).
 * **RPC Infrastructure**: Alchemy Solana Mainnet high-throughput RPC (`solana-mainnet.g.alchemy.com`).
 
@@ -117,8 +125,8 @@ INTENTS_API_KEY=your_aurora_intents_key
 LULO_API_KEY=your_lulo_key
 JUPITER_API_KEY=your_jupiter_key
 
-# Solana RPC
-SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+# Solana RPC (Alchemy Mainnet recommended)
+SOLANA_RPC_URL=https://solana-mainnet.g.alchemy.com/v2/your_key
 ```
 
 ### 3. Run Web App
@@ -144,7 +152,7 @@ npm run build
 
 ## 🏆 Why OmniSavings Wins the MLH Hackathon
 
-1. **Native On-Chain Implementation (CPI)**: Rather than an off-chain API wrapper, OmniSavings deploys a compiled Anchor program that interacts with Jupiter Lend on-chain via CPI.
-2. **True Cross-Chain Onboarding**: Solves the biggest challenge in Solana adoption by allowing any Web2 user or EVM native to fund and save on Solana in seconds.
-3. **Composable DeFi Primitive**: Any Solana protocol or autonomous AI agent can interact with our savings vault program on-chain.
-4. **Complete, Working End-to-End MVP**: Live quotes, cross-chain deposit modal with address & memo copy, atomic transaction generation, and on-chain state inspection.
+1. **Native On-Chain Implementation (CPI)**: Rather than an off-chain API wrapper, OmniSavings deploys a compiled Anchor program (`AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT`) that interacts with Jupiter Lend on-chain via atomic Cross-Program Invocation.
+2. **True Cross-Chain Onboarding**: Solves the biggest friction in Solana adoption by allowing any Web2 user or EVM native (Ethereum, Base, Arbitrum, Polygon, BSC) to fund and save on Solana in seconds via Aurora Intents.
+3. **Yield-to-Equity Innovation (DeFi + Stock Super-App)**: Delivers a real, zero-principal-risk equity investing paradigm: savings interest auto-compounds or swaps into real tokenized US Equities (`SPYx`, `NVDAx`, `AAPLx`) with zero paper trading.
+4. **Complete, Working End-to-End Stack**: Live comparison quotes, atomic transaction compilation, dedicated deposit & withdrawal modals, and full state verification on Solscan.

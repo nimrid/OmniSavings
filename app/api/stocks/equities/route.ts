@@ -12,13 +12,14 @@ export interface LiveEquityInfo {
   category: string;
   description: string;
   issuer: string;
-  icon: string;
+  backing: string;
+  tokenStandard: string;
+  isin?: string;
   tokensPer10Usdc: number;
 }
 
 export async function GET(): Promise<NextResponse> {
   const apiKey = process.env.JUPITER_API_KEY;
-
   const entries = Object.values(TOKENIZED_EQUITIES);
 
   // Query live pricing from Jupiter in parallel for 10 USDC input
@@ -41,7 +42,6 @@ export async function GET(): Promise<NextResponse> {
           if (data.outAmount && Number(data.outAmount) > 0) {
             const outTokens = Number(data.outAmount) / 10 ** eq.decimals;
             tokensPer10Usdc = outTokens;
-            // 10 USDC buys outTokens => price per token = 10 / outTokens
             priceUsd = outTokens > 0 ? 10 / outTokens : 0;
           }
         }
@@ -68,7 +68,9 @@ export async function GET(): Promise<NextResponse> {
         category: eq.category,
         description: eq.description,
         issuer: eq.issuer,
-        icon: eq.icon,
+        backing: eq.backing,
+        tokenStandard: eq.tokenStandard,
+        isin: eq.isin,
         tokensPer10Usdc: Math.round(tokensPer10Usdc * 10000) / 10000,
       };
     })
