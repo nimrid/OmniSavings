@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useVault } from "@/hooks/useVault";
 import { useConnectedWallets } from "@/hooks/useConnectedWallets";
+import { formatPct } from "@/lib/utils/format";
 
 interface VaultCardProps {
   asset?: string;
@@ -64,7 +65,7 @@ export function VaultCard({ asset = "USDC", apyNet }: VaultCardProps) {
         <div className="flex items-center gap-2">
           {apyNet !== undefined && (
             <div className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
-              {(apyNet * 100).toFixed(2)}% APY
+              {formatPct(apyNet)} APY
             </div>
           )}
           <button
