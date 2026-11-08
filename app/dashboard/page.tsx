@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useYield } from "@/hooks/useYield";
 import { formatPct } from "@/lib/utils/format";
 import { YieldTable } from "@/components/YieldTable";
@@ -101,6 +102,32 @@ export default function DashboardPage() {
           ) : data ? (
             <YieldTable quotes={data.quotes} bestId={bestId} />
           ) : null}
+        </div>
+
+        {/* Yield-to-Equity Teaser Banner */}
+        <div className="mt-6 rounded-xl border border-indigo-200 bg-gradient-to-r from-indigo-950 to-slate-900 p-4 text-white flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500 text-white font-bold text-sm">
+              📈
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm text-white">Yield-to-Equity Auto-Invest</span>
+                <span className="rounded bg-indigo-500/30 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-200">
+                  Backpack Stock RWAs
+                </span>
+              </div>
+              <p className="text-xs text-indigo-200/80">
+                Automatically allocate your accrued savings yield into 24/7 tokenized US stocks (NVDA, AAPL, SPY, QQQ) with zero principal risk.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/stocks"
+            className="rounded-lg bg-indigo-500 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-indigo-600 shadow-sm transition-colors"
+          >
+            Explore Stocks & Rules →
+          </Link>
         </div>
 
         {data?.errors && Object.keys(data.errors).length > 0 && (
