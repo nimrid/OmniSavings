@@ -1,0 +1,553 @@
+{
+  "address": "AhYUb1tVN5ppcKAUtr3RiG2g2BM8SQQiw22Nv3PMktTT",
+  "metadata": {
+    "name": "onchain",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "deposit_to_jupiter",
+      "docs": [
+        "Deposit funds into Jupiter Lend Earn via Cross-Program Invocation (CPI)"
+      ],
+      "discriminator": [
+        52,
+        229,
+        90,
+        101,
+        129,
+        24,
+        207,
+        242
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_savings",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  115,
+                  97,
+                  118,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor_token_account",
+          "writable": true
+        },
+        {
+          "name": "recipient_token_account",
+          "writable": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "lending_admin"
+        },
+        {
+          "name": "lending",
+          "writable": true
+        },
+        {
+          "name": "f_token_mint",
+          "writable": true
+        },
+        {
+          "name": "supply_token_reserves_liquidity",
+          "writable": true
+        },
+        {
+          "name": "lending_supply_position_on_liquidity",
+          "writable": true
+        },
+        {
+          "name": "rate_model"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "liquidity",
+          "writable": true
+        },
+        {
+          "name": "liquidity_program",
+          "writable": true
+        },
+        {
+          "name": "rewards_rate_model"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "lending_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_user_savings",
+      "docs": [
+        "Initialize a user's on-chain savings state PDA with a target savings goal"
+      ],
+      "discriminator": [
+        124,
+        170,
+        218,
+        172,
+        34,
+        13,
+        38,
+        166
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "user_savings",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  115,
+                  97,
+                  118,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "savings_goal",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_from_jupiter",
+      "docs": [
+        "Withdraw funds from Jupiter Lend Earn via Cross-Program Invocation (CPI)"
+      ],
+      "discriminator": [
+        187,
+        30,
+        204,
+        57,
+        201,
+        62,
+        109,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_savings",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  115,
+                  97,
+                  118,
+                  105,
+                  110,
+                  103,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_token_account",
+          "writable": true
+        },
+        {
+          "name": "recipient_token_account",
+          "writable": true
+        },
+        {
+          "name": "lending_admin"
+        },
+        {
+          "name": "lending",
+          "writable": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "f_token_mint",
+          "writable": true
+        },
+        {
+          "name": "supply_token_reserves_liquidity",
+          "writable": true
+        },
+        {
+          "name": "lending_supply_position_on_liquidity",
+          "writable": true
+        },
+        {
+          "name": "rate_model"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "claim_account",
+          "writable": true
+        },
+        {
+          "name": "liquidity",
+          "writable": true
+        },
+        {
+          "name": "liquidity_program",
+          "writable": true
+        },
+        {
+          "name": "rewards_rate_model"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "lending_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "UserSavings",
+      "discriminator": [
+        113,
+        78,
+        53,
+        193,
+        194,
+        184,
+        85,
+        110
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "DepositCompleted",
+      "discriminator": [
+        87,
+        191,
+        139,
+        46,
+        172,
+        192,
+        191,
+        52
+      ]
+    },
+    {
+      "name": "WithdrawCompleted",
+      "discriminator": [
+        180,
+        77,
+        152,
+        99,
+        248,
+        179,
+        163,
+        44
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized: Signer does not match savings account owner"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "CpiToLendingProgramFailed",
+      "msg": "CPI invocation to Jupiter Lend Earn program failed"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidLendingProgram",
+      "msg": "Invalid Jupiter lending program provided"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidMint",
+      "msg": "Invalid mint for this user savings account"
+    }
+  ],
+  "types": [
+    {
+      "name": "DepositCompleted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserSavings",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "docs": [
+              "Owner of this savings stash"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_mint",
+            "docs": [
+              "Underlying asset mint (e.g. USDC)"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "total_deposited",
+            "docs": [
+              "Cumulative principal deposited (base units)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "docs": [
+              "Cumulative principal withdrawn (base units)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "deposit_count",
+            "docs": [
+              "Number of deposits completed"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "withdraw_count",
+            "docs": [
+              "Number of withdrawals completed"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "first_deposit_time",
+            "docs": [
+              "Timestamp of initial deposit"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "last_deposit_time",
+            "docs": [
+              "Timestamp of most recent deposit"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "savings_goal",
+            "docs": [
+              "User target savings goal (base units, e.g. 1000 USDC = 1000 * 10^6)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawCompleted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawn",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "JUPITER_EARN_MAINNET_PROGRAM",
+      "type": "pubkey",
+      "value": "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+    },
+    {
+      "name": "JUPITER_LIQUIDITY_MAINNET_PROGRAM",
+      "type": "pubkey",
+      "value": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC"
+    },
+    {
+      "name": "USER_SAVINGS_SEED",
+      "type": "bytes",
+      "value": "[117, 115, 101, 114, 95, 115, 97, 118, 105, 110, 103, 115]"
+    }
+  ]
+}
