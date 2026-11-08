@@ -21,6 +21,7 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
   const [luloModalTab, setLuloModalTab] = useState<"deposit" | "withdraw">("deposit");
   const [luloSelectedMode, setLuloSelectedMode] = useState<"regular" | "protected">("regular");
   const [selectedAsset, setSelectedAsset] = useState("USDC");
+  const [selectedApy, setSelectedApy] = useState<number | undefined>(undefined);
 
   if (quotes.length === 0) {
     return (
@@ -29,9 +30,6 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
       </p>
     );
   }
-
-  const regularQuote = quotes.find((q) => q.marketId.includes("regular"));
-  const protectedQuote = quotes.find((q) => q.marketId.includes("protected"));
 
   const handleDepositClick = (q: YieldQuote) => {
     if (q.protocol === "jupiter") {
@@ -42,8 +40,10 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
         if (el) el.scrollIntoView({ behavior: "smooth" });
       }
     } else if (q.protocol === "lulo") {
+      const isProt = q.marketId.includes("protected") || q.market.toLowerCase().includes("protected");
       setSelectedAsset(q.asset);
-      setLuloSelectedMode(q.marketId.includes("protected") ? "protected" : "regular");
+      setLuloSelectedMode(isProt ? "protected" : "regular");
+      setSelectedApy(q.apyNet);
       setLuloModalTab("deposit");
       setLuloModalOpen(true);
     }
@@ -54,8 +54,10 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
       const el = document.getElementById("vault-card-section");
       if (el) el.scrollIntoView({ behavior: "smooth" });
     } else if (q.protocol === "lulo") {
+      const isProt = q.marketId.includes("protected") || q.market.toLowerCase().includes("protected");
       setSelectedAsset(q.asset);
-      setLuloSelectedMode(q.marketId.includes("protected") ? "protected" : "regular");
+      setLuloSelectedMode(isProt ? "protected" : "regular");
+      setSelectedApy(q.apyNet);
       setLuloModalTab("withdraw");
       setLuloModalOpen(true);
     }
@@ -140,15 +142,14 @@ export function YieldTable({ quotes, bestId, onOpenJupiterVault }: Props) {
         </table>
       </div>
 
-      {/* Lulo Deposit / Withdraw Modal */}
+      {/* Lulo Deposit / Withdraw Modal (Dedicated per market) */}
       <LuloDepositModal
         open={luloModalOpen}
         onClose={() => setLuloModalOpen(false)}
         asset={selectedAsset}
-        defaultMode={luloSelectedMode}
+        mode={luloSelectedMode}
         initialTab={luloModalTab}
-        regularApy={regularQuote?.apyNet}
-        protectedApy={protectedQuote?.apyNet}
+        apy={selectedApy}
       />
     </>
   );

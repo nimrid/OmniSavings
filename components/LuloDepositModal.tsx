@@ -18,44 +18,51 @@ interface LuloAccountData {
   };
   totalInterestEarned: number;
   protectedInterestEarned: number;
+  regularInterestEarned: number;
 }
 
-interface LuloDepositModalProps {
+export interface LuloDepositModalProps {
   open: boolean;
   onClose: () => void;
   asset?: string;
-  defaultMode?: "regular" | "protected";
+  mode: "regular" | "protected";
   initialTab?: "deposit" | "withdraw";
-  regularApy?: number;
-  protectedApy?: number;
+  apy?: number;
 }
 
 export function LuloDepositModal({
   open,
   onClose,
   asset = "USDC",
-  defaultMode = "regular",
+  mode,
   initialTab = "deposit",
-  regularApy,
-  protectedApy,
+  apy,
 }: LuloDepositModalProps) {
   const { primaryWallet } = useConnectedWallets();
   const { signAndSendTransaction } = useSignAndSendTransaction();
 
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">(initialTab);
   const [amount, setAmount] = useState("10");
-  const [mode, setMode] = useState<"regular" | "protected">(defaultMode);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
 
-  // Lulo Account state for withdrawals
+  // Lulo Account state
   const [luloAccount, setLuloAccount] = useState<LuloAccountData | null>(null);
   const [loadingAccount, setLoadingAccount] = useState(false);
 
+  const isProtected = mode === "protected";
+  const marketName = isProtected ? "Lulo Protected" : "Lulo Regular";
+
+  // Reset tab and clear state whenever modal opens or mode changes
   useEffect(() => {
-    setActiveTab(initialTab);
-  }, [initialTab, open]);
+    if (open) {
+      setActiveTab(initialTab);
+      setError(null);
+      setTxSignature(null);
+      setAmount("10");
+    }
+  }, [open, initialTab, mode]);
 
   const fetchLuloAccount = useCallback(async () => {
     if (!primaryWallet?.address) return;
@@ -81,10 +88,17 @@ export function LuloDepositModal({
 
   if (!open) return null;
 
-  const maxWithdrawableProtected =
-    luloAccount?.maxWithdrawable?.protected?.[USDC_MINT] ??
-    luloAccount?.pusdUsdBalance ??
-    0;
+  const currentBalance = isProtected
+    ? luloAccount?.pusdUsdBalance ?? 0
+    : luloAccount?.lusdUsdBalance ?? 0;
+
+  const maxWithdrawable = isProtected
+    ? luloAccount?.maxWithdrawable?.protected?.[USDC_MINT] ?? currentBalance
+    : luloAccount?.maxWithdrawable?.regular?.[USDC_MINT] ?? currentBalance;
+
+  const accruedInterest = isProtected
+    ? luloAccount?.protectedInterestEarned ?? 0
+    : luloAccount?.regularInterestEarned ?? 0;
 
   const handleDeposit = async () => {
     if (!primaryWallet?.address) {
@@ -150,8 +164,10 @@ export function LuloDepositModal({
       return;
     }
 
-    if (maxWithdrawableProtected > 0 && numAmount > maxWithdrawableProtected) {
-      setError(`Cannot withdraw more than your available balance (${maxWithdrawableProtected.toFixed(2)} USDC).`);
+    if (maxWithdrawable > 0 && numAmount > maxWithdrawable) {
+      setError(
+        `Cannot withdraw more than your available balance (${maxWithdrawable.toFixed(2)} ${asset}).`
+      );
       return;
     }
 
@@ -202,16 +218,20 @@ export function LuloDepositModal({
     >
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-white font-bold text-xs">
-              L
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white font-bold text-xs shadow-sm">
+              {isProtected ? "🛡️" : "L"}
             </span>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">
-                Lulo Yield Aggregator
+              <h3 className="text-base font-bold text-slate-900">
+                {activeTab === "deposit"
+                  ? `Deposit into ${marketName}`
+                  : `Withdraw from ${marketName}`}
               </h3>
               <p className="text-xs text-slate-500">
-                Automated Solana lending with principal protection
+                {isProtected
+                  ? "Automated Solana lending with principal coverage"
+                  : "Automated Solana lending with flexible max yield"}
               </p>
             </div>
           </div>
@@ -223,7 +243,7 @@ export function LuloDepositModal({
           </button>
         </div>
 
-        {/* Tab Switcher */}
+        {/* Tab Switcher for this market */}
         <div className="mt-4 flex border-b border-slate-200">
           <button
             type="button"
@@ -231,6 +251,7 @@ export function LuloDepositModal({
               setActiveTab("deposit");
               setError(null);
               setTxSignature(null);
+              setAmount("10");
             }}
             className={`pb-2 px-3 text-xs font-semibold transition-colors border-b-2 ${
               activeTab === "deposit"
@@ -246,8 +267,8 @@ export function LuloDepositModal({
               setActiveTab("withdraw");
               setError(null);
               setTxSignature(null);
-              if (maxWithdrawableProtected > 0) {
-                setAmount(maxWithdrawableProtected.toString());
+              if (maxWithdrawable > 0) {
+                setAmount(maxWithdrawable.toString());
               }
             }}
             className={`pb-2 px-3 text-xs font-semibold transition-colors border-b-2 ${
@@ -256,101 +277,68 @@ export function LuloDepositModal({
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
-            Withdraw Protected
+            Withdraw
           </button>
         </div>
 
         <div className="mt-4 space-y-3">
-          {activeTab === "deposit" ? (
-            <>
-              {/* Mode Selector */}
+          {/* Individual Market Info Card */}
+          <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3">
+            <div className="flex items-center justify-between">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Deposit Strategy
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setMode("regular")}
-                    className={`rounded-lg border p-2.5 text-left transition-colors ${
-                      mode === "regular"
-                        ? "border-emerald-600 bg-emerald-50/60 ring-1 ring-emerald-600"
-                        : "border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="font-semibold text-xs text-slate-900">
-                      Lulo Regular
-                    </div>
-                    <div className="text-[11px] text-emerald-700 font-medium mt-0.5">
-                      {formatPct(regularApy)} APY
-                    </div>
-                    <div className="text-[10px] text-slate-500 mt-1">
-                      Flexible rate, max yield
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setMode("protected")}
-                    className={`rounded-lg border p-2.5 text-left transition-colors ${
-                      mode === "protected"
-                        ? "border-emerald-600 bg-emerald-50/60 ring-1 ring-emerald-600"
-                        : "border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="font-semibold text-xs text-slate-900">
-                      Lulo Protected
-                    </div>
-                    <div className="text-[11px] text-emerald-700 font-medium mt-0.5">
-                      {formatPct(protectedApy)} APY
-                    </div>
-                    <div className="text-[10px] text-slate-500 mt-1">
-                      Principal coverage protection
-                    </div>
-                  </button>
+                <span className="font-semibold text-xs text-slate-900 block">
+                  {marketName}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  {isProtected
+                    ? "Principal coverage protection enabled"
+                    : "Dynamic routing across Kamino, Marginfi & Save"}
+                </span>
+              </div>
+              {apy !== undefined && (
+                <div className="rounded-md bg-emerald-100/80 px-2 py-0.5 text-xs font-bold text-emerald-800">
+                  {formatPct(apy)} APY
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
 
-              {/* Deposit Amount Input */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700">
-                  Deposit Amount ({asset})
-                </label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="any"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
-                  placeholder="e.g. 10"
-                />
-              </div>
-            </>
+          {activeTab === "deposit" ? (
+            /* Deposit Flow */
+            <div>
+              <label className="block text-xs font-medium text-slate-700">
+                Deposit Amount ({asset})
+              </label>
+              <input
+                type="number"
+                min="0.1"
+                step="any"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"
+                placeholder="e.g. 10"
+              />
+            </div>
           ) : (
+            /* Withdraw Flow */
             <>
-              {/* Withdraw Section */}
-              <div className="rounded-lg bg-emerald-50/50 border border-emerald-100 p-3 text-xs space-y-1.5">
+              <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Protected Balance:</span>
+                  <span className="text-slate-600">Current Balance:</span>
                   <span className="font-bold text-slate-900 tabular-nums">
-                    {loadingAccount
-                      ? "…"
-                      : `$${(luloAccount?.pusdUsdBalance ?? 0).toFixed(2)} USDC`}
+                    {loadingAccount ? "…" : `$${currentBalance.toFixed(2)} ${asset}`}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-slate-500">Max Withdrawable:</span>
                   <span className="font-semibold text-emerald-700 tabular-nums">
-                    {loadingAccount
-                      ? "…"
-                      : `$${maxWithdrawableProtected.toFixed(2)} USDC`}
+                    {loadingAccount ? "…" : `$${maxWithdrawable.toFixed(2)} ${asset}`}
                   </span>
                 </div>
-                {luloAccount && luloAccount.protectedInterestEarned > 0 && (
+                {accruedInterest > 0 && (
                   <div className="flex justify-between items-center text-[11px] text-emerald-800">
                     <span>Accrued Yield:</span>
-                    <span>+${luloAccount.protectedInterestEarned.toFixed(4)} USDC</span>
+                    <span>+${accruedInterest.toFixed(4)} {asset}</span>
                   </div>
                 )}
               </div>
@@ -360,10 +348,10 @@ export function LuloDepositModal({
                   <label className="block text-xs font-medium text-slate-700">
                     Withdraw Amount ({asset})
                   </label>
-                  {maxWithdrawableProtected > 0 && (
+                  {maxWithdrawable > 0 && (
                     <button
                       type="button"
-                      onClick={() => setAmount(maxWithdrawableProtected.toString())}
+                      onClick={() => setAmount(maxWithdrawable.toString())}
                       className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900"
                     >
                       Use Max
