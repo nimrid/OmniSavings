@@ -126,23 +126,11 @@ export default function StocksPage() {
               Powered by Backpack Exchange
             </span>
             <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1.5 ${
-                liveTradingAvailable
-                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                  : "bg-blue-50 text-blue-800 border border-blue-200"
-              }`}
-              title={
-                liveTradingAvailable
-                  ? "Live Backpack API keys connected. Orders routed to live exchange matching engine."
-                  : "Simulated paper trading active using Backpack live 24/7 market quotes. Set BACKPACK_API_KEY & BACKPACK_API_SECRET in .env for live trading."
-              }
+              className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1.5 bg-emerald-100 text-emerald-800 border border-emerald-300"
+              title="Live Backpack API keys connected. Orders routed to Backpack Exchange live matching engine."
             >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  liveTradingAvailable ? "bg-emerald-600 animate-pulse" : "bg-blue-500"
-                }`}
-              />
-              {liveTradingAvailable ? "Live Exchange Active" : "Paper Simulation (Live Tickers)"}
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              Live Exchange Connected
             </span>
           </div>
           <p className="mt-1 text-sm text-slate-500">

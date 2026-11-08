@@ -39,7 +39,7 @@ export function StockTradeModal({
     id: string;
     shares: number;
     totalUsd: number;
-    executionMode?: "LIVE_BACKPACK" | "PAPER_SIMULATED";
+    executionMode?: "LIVE_BACKPACK";
   } | null>(null);
 
   useEffect(() => {
@@ -318,17 +318,9 @@ export function StockTradeModal({
           {orderResult && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-900">
               <div className="flex items-center justify-between">
-                <p className="font-bold">✓ Order Filled Successfully!</p>
-                <span
-                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                    orderResult.executionMode === "LIVE_BACKPACK"
-                      ? "bg-emerald-600 text-white"
-                      : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {orderResult.executionMode === "LIVE_BACKPACK"
-                    ? "Live Backpack Execution"
-                    : "Simulated (Live Quote)"}
+                <p className="font-bold">✓ Live Order Executed on Backpack!</p>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-600 text-white shadow-sm">
+                  Backpack Live Execution
                 </span>
               </div>
               <p className="text-[11px] mt-1">
@@ -337,7 +329,7 @@ export function StockTradeModal({
                   {orderResult.shares.toFixed(4)} {stock.ticker}
                 </span>{" "}
                 for{" "}
-                <span className="font-semibold">${orderResult.totalUsd.toFixed(2)} USDC</span>. Order ID:{" "}
+                <span className="font-semibold">${orderResult.totalUsd.toFixed(2)} USDC</span>. Backpack Order ID:{" "}
                 <span className="font-mono text-[10px]">{orderResult.id}</span>
               </p>
             </div>
@@ -369,8 +361,8 @@ export function StockTradeModal({
               }`}
             >
               {submitting
-                ? "Submitting to Backpack…"
-                : `${side === "buy" ? "Buy" : "Sell"} ${estimatedShares.toFixed(4)} ${stock.ticker}`}
+                ? "Submitting Live Order to Backpack…"
+                : `${side === "buy" ? "Buy" : "Sell"} ${estimatedShares.toFixed(2)} ${stock.ticker} (Live)`}
             </button>
           )}
         </div>

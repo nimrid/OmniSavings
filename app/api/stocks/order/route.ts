@@ -26,8 +26,8 @@ export interface StockOrder {
   totalUsd: number;
   timestamp: string;
   status: "FILLED";
-  executionMode?: "LIVE_BACKPACK" | "PAPER_SIMULATED";
-  backpackOrderId?: string;
+  executionMode: "LIVE_BACKPACK";
+  backpackOrderId: string;
 }
 
 // In-memory portfolio and order stores
@@ -79,47 +79,64 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: "Invalid amount or price" }, { status: 400 });
     }
 
-    const numShares = numAmount / numPrice;
-    const now = new Date().toISOString();
-    let executionMode: "LIVE_BACKPACK" | "PAPER_SIMULATED" = "PAPER_SIMULATED";
-    let backpackOrderId: string | undefined = undefined;
-
-    // Check if live credentials exist
-    if (hasBackpackCredentials()) {
-      try {
-        const liveRes = await executeBackpackOrderLive({
-          symbol,
-          side: side === "buy" ? "Bid" : "Ask",
-          orderType: "Market",
-          quantity: numShares.toFixed(4),
-        });
-        executionMode = "LIVE_BACKPACK";
-        backpackOrderId = liveRes?.id || liveRes?.orderId || `BKP-${Date.now()}`;
-      } catch (liveErr) {
-        const errMsg = liveErr instanceof Error ? liveErr.message : String(liveErr);
-        return NextResponse.json(
-          {
-            error: `Backpack Exchange live order rejected: ${errMsg}. Note: Backpack requires KYC verification & an accepted Securities agreement for RWA stock trading.`,
-          },
-          { status: 400 }
-        );
-      }
+    if (!hasBackpackCredentials()) {
+      return NextResponse.json(
+        {
+          error:
+            "Backpack Exchange API keys (BACKPACK_API_KEY and BACKPACK_API_SECRET) must be set in .env to place live orders.",
+        },
+        { status: 400 }
+      );
     }
 
-    const orderId = backpackOrderId || `BKP-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    const roundedShares = Math.floor((numAmount / numPrice) * 100) / 100;
+    if (roundedShares < 0.01) {
+      return NextResponse.json(
+        {
+          error: `Minimum order size on Backpack Exchange is 0.01 shares (approx $${(
+            0.01 * numPrice
+          ).toFixed(2)} USDC). Please increase your order amount.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const now = new Date().toISOString();
+    let liveRes: any;
+
+    try {
+      liveRes = await executeBackpackOrderLive({
+        symbol,
+        side: side === "buy" ? "Bid" : "Ask",
+        orderType: "Market",
+        quantity: roundedShares.toFixed(2),
+      });
+    } catch (liveErr) {
+      const errMsg = liveErr instanceof Error ? liveErr.message : String(liveErr);
+      return NextResponse.json(
+        {
+          error: `Backpack Exchange order rejected: ${errMsg}. Note: Backpack Securities requires completed KYC and the one-time Securities trading agreement to be accepted at backpack.exchange.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const backpackOrderId = String(
+      liveRes?.id || liveRes?.orderId || `BKP-${Date.now()}`
+    );
 
     const order: StockOrder = {
-      id: orderId,
+      id: backpackOrderId,
       user,
       symbol,
       ticker,
       side,
-      shares: numShares,
+      shares: roundedShares,
       priceUsd: numPrice,
-      totalUsd: numAmount,
+      totalUsd: roundedShares * numPrice,
       timestamp: now,
       status: "FILLED",
-      executionMode,
+      executionMode: "LIVE_BACKPACK",
       backpackOrderId,
     };
 
@@ -131,9 +148,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     const existing = userMap.get(symbol);
 
     if (side === "buy") {
+      const actualAmountUsd = roundedShares * numPrice;
       if (existing) {
-        const newShares = existing.shares + numShares;
-        const newTotalCost = existing.totalCostUsd + numAmount;
+        const newShares = existing.shares + roundedShares;
+        const newTotalCost = existing.totalCostUsd + actualAmountUsd;
         const newAvg = newTotalCost / newShares;
         existing.shares = newShares;
         existing.totalCostUsd = newTotalCost;
@@ -148,11 +166,11 @@ export async function POST(request: Request): Promise<NextResponse> {
           symbol,
           ticker,
           name: name || ticker,
-          shares: numShares,
+          shares: roundedShares,
           avgCostUsd: numPrice,
-          totalCostUsd: numAmount,
+          totalCostUsd: actualAmountUsd,
           currentPrice: numPrice,
-          currentValueUsd: numAmount,
+          currentValueUsd: actualAmountUsd,
           unrealizedPnlUsd: 0,
           unrealizedPnlPct: 0,
           updatedAt: now,
@@ -160,13 +178,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
     } else {
       // Sell
-      if (!existing || existing.shares < numShares * 0.99) {
+      if (!existing || existing.shares < roundedShares * 0.99) {
         return NextResponse.json(
           { error: `Insufficient shares to sell. You own ${existing?.shares.toFixed(4) ?? 0} shares.` },
           { status: 400 }
         );
       }
-      const remainingShares = Math.max(0, existing.shares - numShares);
+      const remainingShares = Math.max(0, existing.shares - roundedShares);
       if (remainingShares === 0) {
         userMap.delete(symbol);
       } else {
@@ -188,7 +206,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       order,
-      executionMode,
+      executionMode: "LIVE_BACKPACK",
       position: userMap.get(symbol) || null,
     });
   } catch (err) {
