@@ -8,6 +8,12 @@ const HIGHLIGHTS = [
     color: "bg-indigo-50 text-indigo-700 border-indigo-200",
   },
   {
+    title: "Yield-to-Equity Auto-Invest",
+    tag: "Backpack Exchange",
+    desc: "Never risk your principal. Automatically allocate accrued savings yield into 24/7 tokenized US stocks & indices (NVDA, AAPL, SPY).",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+  },
+  {
     title: "Universal Cross-Chain Inflow",
     tag: "Aurora Intents",
     desc: "Fund your Solana savings account directly from 8+ chains (Ethereum, Base, Arbitrum, BSC, Optimism, Polygon, Avalanche).",
@@ -37,6 +43,11 @@ const PROTOCOLS = [
     chain: "Solana",
     note: "Flexible savings and principal-protected lending",
   },
+  {
+    name: "Backpack Exchange",
+    chain: "Solana RWA",
+    note: "24/7 Tokenized Equities & Index ETFs (NVDA, AAPL, SPY, QQQ, TSLA)",
+  },
 ];
 
 export default function HomePage() {
@@ -61,6 +72,12 @@ export default function HomePage() {
         >
           Open Yield Dashboard →
         </Link>
+        <Link
+          href="/stocks"
+          className="inline-block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-indigo-700 transition-colors"
+        >
+          Stock RWAs & Auto-DCA →
+        </Link>
         <a
           href="https://github.com/your-username/defi-savings-app"
           target="_blank"
@@ -73,7 +90,7 @@ export default function HomePage() {
 
       <div className="mt-12">
         <h2 className="text-xl font-bold text-slate-900">How OmniSavings Works</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {HIGHLIGHTS.map((h) => (
             <div
               key={h.title}

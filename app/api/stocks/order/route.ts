@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { executeBackpackOrderLive, hasBackpackCredentials } from "@/lib/backpack/client";
 
 export interface StockPosition {
   symbol: string;
@@ -25,6 +26,8 @@ export interface StockOrder {
   totalUsd: number;
   timestamp: string;
   status: "FILLED";
+  executionMode?: "LIVE_BACKPACK" | "PAPER_SIMULATED";
+  backpackOrderId?: string;
 }
 
 // In-memory portfolio and order stores
@@ -57,6 +60,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     totalCostUsd,
     totalPnlUsd,
     totalPnlPct,
+    liveTradingAvailable: hasBackpackCredentials(),
   });
 }
 
@@ -77,7 +81,32 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const numShares = numAmount / numPrice;
     const now = new Date().toISOString();
-    const orderId = `BKP-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    let executionMode: "LIVE_BACKPACK" | "PAPER_SIMULATED" = "PAPER_SIMULATED";
+    let backpackOrderId: string | undefined = undefined;
+
+    // Check if live credentials exist
+    if (hasBackpackCredentials()) {
+      try {
+        const liveRes = await executeBackpackOrderLive({
+          symbol,
+          side: side === "buy" ? "Bid" : "Ask",
+          orderType: "Market",
+          quantity: numShares.toFixed(4),
+        });
+        executionMode = "LIVE_BACKPACK";
+        backpackOrderId = liveRes?.id || liveRes?.orderId || `BKP-${Date.now()}`;
+      } catch (liveErr) {
+        const errMsg = liveErr instanceof Error ? liveErr.message : String(liveErr);
+        return NextResponse.json(
+          {
+            error: `Backpack Exchange live order rejected: ${errMsg}. Note: Backpack requires KYC verification & an accepted Securities agreement for RWA stock trading.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    const orderId = backpackOrderId || `BKP-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
     const order: StockOrder = {
       id: orderId,
@@ -90,6 +119,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       totalUsd: numAmount,
       timestamp: now,
       status: "FILLED",
+      executionMode,
+      backpackOrderId,
     };
 
     const key = user.toLowerCase();
@@ -157,6 +188,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       order,
+      executionMode,
       position: userMap.get(symbol) || null,
     });
   } catch (err) {
@@ -171,3 +203,4 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 }
+

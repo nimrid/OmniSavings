@@ -46,6 +46,7 @@ export default function StocksPage() {
   const [totalPortfolioValue, setTotalPortfolioValue] = useState(0);
   const [totalPnlUsd, setTotalPnlUsd] = useState(0);
   const [totalPnlPct, setTotalPnlPct] = useState(0);
+  const [liveTradingAvailable, setLiveTradingAvailable] = useState<boolean>(false);
 
   // Active trade modal state
   const [tradeModalOpen, setTradeModalOpen] = useState(false);
@@ -69,16 +70,19 @@ export default function StocksPage() {
 
   // Fetch user holdings and order history
   const fetchPortfolio = useCallback(async () => {
-    if (!primaryWallet?.address) return;
+    const userParam = primaryWallet?.address || "guest";
     try {
-      const res = await fetch(`/api/stocks/order?user=${primaryWallet.address}`);
+      const res = await fetch(`/api/stocks/order?user=${userParam}`);
       if (res.ok) {
         const data = await res.json();
-        setPositions(data.positions || []);
-        setOrders(data.orders || []);
-        setTotalPortfolioValue(data.totalPortfolioValueUsd || 0);
-        setTotalPnlUsd(data.totalPnlUsd || 0);
-        setTotalPnlPct(data.totalPnlPct || 0);
+        setLiveTradingAvailable(Boolean(data.liveTradingAvailable));
+        if (primaryWallet?.address) {
+          setPositions(data.positions || []);
+          setOrders(data.orders || []);
+          setTotalPortfolioValue(data.totalPortfolioValueUsd || 0);
+          setTotalPnlUsd(data.totalPnlUsd || 0);
+          setTotalPnlPct(data.totalPnlPct || 0);
+        }
       }
     } catch {
       // ignore
@@ -120,6 +124,25 @@ export default function StocksPage() {
             </h1>
             <span className="rounded-full bg-slate-900 text-white px-2.5 py-0.5 text-xs font-semibold">
               Powered by Backpack Exchange
+            </span>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1.5 ${
+                liveTradingAvailable
+                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                  : "bg-blue-50 text-blue-800 border border-blue-200"
+              }`}
+              title={
+                liveTradingAvailable
+                  ? "Live Backpack API keys connected. Orders routed to live exchange matching engine."
+                  : "Simulated paper trading active using Backpack live 24/7 market quotes. Set BACKPACK_API_KEY & BACKPACK_API_SECRET in .env for live trading."
+              }
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  liveTradingAvailable ? "bg-emerald-600 animate-pulse" : "bg-blue-500"
+                }`}
+              />
+              {liveTradingAvailable ? "Live Exchange Active" : "Paper Simulation (Live Tickers)"}
             </span>
           </div>
           <p className="mt-1 text-sm text-slate-500">
@@ -325,3 +348,4 @@ export default function StocksPage() {
     </div>
   );
 }
+

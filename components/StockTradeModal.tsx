@@ -35,7 +35,12 @@ export function StockTradeModal({
   const [loadingChart, setLoadingChart] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [orderResult, setOrderResult] = useState<{ id: string; shares: number; totalUsd: number } | null>(null);
+  const [orderResult, setOrderResult] = useState<{
+    id: string;
+    shares: number;
+    totalUsd: number;
+    executionMode?: "LIVE_BACKPACK" | "PAPER_SIMULATED";
+  } | null>(null);
 
   useEffect(() => {
     setSide(initialSide);
@@ -110,6 +115,7 @@ export function StockTradeModal({
         id: data.order.id,
         shares: data.order.shares,
         totalUsd: data.order.totalUsd,
+        executionMode: data.executionMode || data.order.executionMode,
       });
 
       if (onSuccess) onSuccess();
@@ -311,10 +317,26 @@ export function StockTradeModal({
 
           {orderResult && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-900">
-              <p className="font-bold">✓ Order Filled Successfully!</p>
-              <p className="text-[11px] mt-0.5">
+              <div className="flex items-center justify-between">
+                <p className="font-bold">✓ Order Filled Successfully!</p>
+                <span
+                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                    orderResult.executionMode === "LIVE_BACKPACK"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  {orderResult.executionMode === "LIVE_BACKPACK"
+                    ? "Live Backpack Execution"
+                    : "Simulated (Live Quote)"}
+                </span>
+              </div>
+              <p className="text-[11px] mt-1">
                 {side === "buy" ? "Purchased" : "Sold"}{" "}
-                <span className="font-semibold font-mono">{orderResult.shares.toFixed(4)} {stock.ticker}</span> for{" "}
+                <span className="font-semibold font-mono">
+                  {orderResult.shares.toFixed(4)} {stock.ticker}
+                </span>{" "}
+                for{" "}
                 <span className="font-semibold">${orderResult.totalUsd.toFixed(2)} USDC</span>. Order ID:{" "}
                 <span className="font-mono text-[10px]">{orderResult.id}</span>
               </p>
@@ -356,3 +378,4 @@ export function StockTradeModal({
     </div>
   );
 }
+

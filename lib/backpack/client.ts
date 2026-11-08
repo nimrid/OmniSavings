@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import type {
   BackpackKline,
   BackpackTicker,
@@ -88,6 +89,109 @@ export const CURATED_STOCKS: StockMetadata[] = [
 ];
 
 /**
+ * Check if the server has live Backpack Exchange API keys configured
+ */
+export function hasBackpackCredentials(): boolean {
+  return Boolean(
+    process.env.BACKPACK_API_KEY &&
+    process.env.BACKPACK_API_SECRET &&
+    process.env.BACKPACK_API_KEY.trim().length > 0 &&
+    process.env.BACKPACK_API_SECRET.trim().length > 0
+  );
+}
+
+/**
+ * Convert Base64 Ed25519 secret seed into a Node.js crypto PrivateKey
+ */
+function createEd25519PrivateKeyFromBase64(secretBase64: string): crypto.KeyObject {
+  const rawBytes = Buffer.from(secretBase64.trim(), "base64");
+  const seed = rawBytes.length >= 32 ? rawBytes.subarray(0, 32) : rawBytes;
+  if (seed.length !== 32) {
+    throw new Error(`Invalid Ed25519 secret seed length: expected 32 bytes, got ${seed.length}`);
+  }
+  // PKCS#8 DER prefix for Ed25519
+  const prefix = Buffer.from("302e020100300506032b657004220420", "hex");
+  const pkcs8Key = Buffer.concat([prefix, seed]);
+  return crypto.createPrivateKey({ key: pkcs8Key, format: "der", type: "pkcs8" });
+}
+
+/**
+ * Sign an instruction payload for Backpack Exchange API using Ed25519
+ */
+export function signBackpackRequest(
+  instruction: string,
+  params: Record<string, string>,
+  timestamp: number,
+  windowMs: number,
+  secretBase64: string
+): string {
+  const privKey = createEd25519PrivateKeyFromBase64(secretBase64);
+  const sortedKeys = Object.keys(params).sort();
+  const sortedPairs = sortedKeys.map((k) => `${k}=${params[k]}`);
+  const paramString = sortedPairs.length > 0 ? "&" + sortedPairs.join("&") : "";
+  const signString = `instruction=${instruction}${paramString}&timestamp=${timestamp}&window=${windowMs}`;
+  const sig = crypto.sign(null, Buffer.from(signString, "utf-8"), privKey);
+  return sig.toString("base64");
+}
+
+/**
+ * Execute an authenticated order live on Backpack Exchange
+ */
+export async function executeBackpackOrderLive(orderParams: {
+  symbol: string;
+  side: "Bid" | "Ask";
+  orderType: "Market" | "Limit";
+  quantity: string;
+  price?: string;
+}) {
+  const apiKey = process.env.BACKPACK_API_KEY;
+  const apiSecret = process.env.BACKPACK_API_SECRET;
+  if (!apiKey || !apiSecret) {
+    throw new Error("BACKPACK_API_KEY and BACKPACK_API_SECRET are not set in environment");
+  }
+
+  const timestamp = Date.now();
+  const windowMs = 5000;
+
+  const paramsToSign: Record<string, string> = {
+    orderType: orderParams.orderType,
+    quantity: orderParams.quantity,
+    side: orderParams.side,
+    symbol: orderParams.symbol,
+  };
+  if (orderParams.price) {
+    paramsToSign.price = orderParams.price;
+  }
+
+  const signature = signBackpackRequest(
+    "orderExecute",
+    paramsToSign,
+    timestamp,
+    windowMs,
+    apiSecret
+  );
+
+  const res = await fetch(`${BACKPACK_API_BASE}/order`, {
+    method: "POST",
+    headers: {
+      "X-API-Key": apiKey.trim(),
+      "X-Signature": signature,
+      "X-Timestamp": String(timestamp),
+      "X-Window": String(windowMs),
+      "Content-Type": "application/json; charset=utf-8",
+    },
+    body: JSON.stringify(paramsToSign),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`Backpack Exchange rejected order (HTTP ${res.status}): ${errorBody}`);
+  }
+
+  return await res.json();
+}
+
+/**
  * Fetch real-time ticker data for all curated stock RWAs on Backpack
  */
 export async function getStockQuotes(): Promise<StockRwaQuote[]> {
@@ -151,3 +255,4 @@ export async function getStockKlines(
   }
   return (await res.json()) as BackpackKline[];
 }
+

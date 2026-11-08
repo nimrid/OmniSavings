@@ -73,3 +73,4 @@ export function StockCard({ stock, onTrade }: StockCardProps) {
     </div>
   );
 }
+

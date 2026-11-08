@@ -244,3 +244,4 @@ export function YieldToEquityCard({ vaultBalanceUsd = 2500, averageApy = 6.0 }: 
     </div>
   );
 }
+
