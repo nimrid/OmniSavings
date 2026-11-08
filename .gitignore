@@ -1,5 +1,6 @@
 node_modules/
 .next/
+*.tsbuildinfo
 out/
 dist/
 *.log
@@ -10,6 +11,7 @@ onchain/target/
 
 # Video & Demo Generation files
 demo-video/
+scripts/video/
 *.mp4
 *.mov
 *.webm
@@ -22,3 +24,4 @@ demo-video/
 *.aac
 .remotion/
 render_final_video.py
+test_hero.png
